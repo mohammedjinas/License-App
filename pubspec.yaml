@@ -45,6 +45,8 @@ dependencies:
   image_picker: ^0.8.6
   qr_code_tools:
   auto_size_text_field:
+  pdf:
+  printing:
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +74,8 @@ flutter:
   assets:
     - assets/images/login_bg.jpg
     - assets/images/logo.png
+    - assets/images/nodata.png
+    - assets/images/remarks.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -24,11 +24,11 @@ class _LoginState extends State<Login> {
     double height = MediaQuery.of(context).size.height;
 
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
       image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)
       ),
       child: Scaffold(
-        appBar: AppBar(title: Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),),
+        appBar: AppBar(title: const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),),
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -37,7 +37,7 @@ class _LoginState extends State<Login> {
                 alignment: Alignment.topLeft,
                 padding: EdgeInsets.only(top: height * 0.05),
                 child: Row(
-                  children: [Text("Office Wifi",style: TextStyle(fontSize: 15),),
+                  children: [const Text("Office Wifi",style: TextStyle(fontSize: 15),),
                     Checkbox(
                       value: isChecked,activeColor: Colors.black, onChanged: (bool? checkValue) { setState(() {
                       isChecked = checkValue!;
@@ -50,35 +50,35 @@ class _LoginState extends State<Login> {
             Container(
               alignment: Alignment.topCenter,
               padding: EdgeInsets.only(top: height * 0.15),
-              child: Text("SIGN IN",style: TextStyle(color: Colors.black,fontSize: 40,fontWeight: FontWeight.w700,fontStyle: FontStyle.italic),
+              child: const Text("SIGN IN",style: TextStyle(color: Colors.black,fontSize: 40,fontWeight: FontWeight.w700,fontStyle: FontStyle.italic),
               ),
             ),
-//Container(height: height * 0.7,padding:EdgeInsets.only(top: height* 0.9) , decoration: BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/logo.png"))),),
-            Container(height: height * 0.5,//decoration: BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/logo.png"))),
+
+            Container(height: height * 0.5,
             padding: EdgeInsets.only(top : height * 0.2),
               child: Card(
-                elevation: 5,margin: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                elevation: 5,margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
                 child: Column(
                   children: [
-                    Container(padding: EdgeInsets.all(10), child: 
+                    Container(padding: const EdgeInsets.all(10),height: height * 0.1, child: 
                       TextField(decoration: InputDecoration(labelText: "Username",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
                       hintText: "Username",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
                       onChanged: (value) => username = value,
                       ),
                     ),
                     
-                    Container(padding: EdgeInsets.all(10), child: 
+                    Container(padding: const EdgeInsets.all(10),height: height * 0.1,  child: 
                       TextField(obscureText: true, decoration: InputDecoration( labelText: "Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
                       hintText: "Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
                       onChanged: (value) => password = value,
                       ),
                     ),
 
-                    Container(width: width * 0.6,
+                    SizedBox(width: width * 0.6, height: height * 0.05, 
                       child: 
                       ElevatedButton(
-                        child: Text("Log In",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),),
-                        onPressed: () => login(),style: ElevatedButton.styleFrom(backgroundColor: Colors.white)
+                        onPressed: () => login(),style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                        child: const Text("Log In",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),),
                       ),
                     ),
                   ],
@@ -97,8 +97,8 @@ class _LoginState extends State<Login> {
     {
       baseURL = "http://192.168.1.127:1111";
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("URL set to Office",style: TextStyle(color: Colors.black),),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+      content: const Text("URL set to Office",style: TextStyle(color: Colors.black),),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
       behavior: SnackBarBehavior.floating,
       backgroundColor: Colors.grey[350],
     ));
@@ -121,31 +121,33 @@ class _LoginState extends State<Login> {
        final body = jsonDecode(loginResponse.body);
        if(body['loginStatus'] == "1") 
        {
+        int userFlag = body['userFlag'];
         prefs.setString("baseURL", baseURL);
         prefs.setString("username", username);
         prefs.setString("password", password);
         prefs.setBool("isLogged", true);
+        prefs.setInt("userFlag", userFlag);
 
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) {return HomePage();} ));
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) {return HomePage(userFlag: userFlag,);} ));
        }
        else
        {
-        prefs.setBool("isLogged", true);
+        prefs.setBool("isLogged", false);
 
         showDialog(context: context,
-        builder: (context) => AlertDialog(title: Text("RetailX License"),
+        builder: (context) => AlertDialog(title: const Text("RetailX License"),
         content: Text(body['loginMesage']),
-        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: Text("OK"))],),);
+        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),);
        }
       }
       else 
       {
-        prefs.setBool("isLogged", true);
+        prefs.setBool("isLogged", false);
 
         showDialog(context: context,
-        builder: (context) => AlertDialog(title: Text("RetailX License"),
-        content: Text("API Error!"),
-        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: Text("OK"))],),);
+        builder: (context) => AlertDialog(title: const Text("RetailX License"),
+        content: const Text("API Error!"),
+        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),);
       }
     }
   }
@@ -163,15 +165,15 @@ class _LoginState extends State<Login> {
         )));
       }
 
-      else if(username.length < 5) 
-      {
-        showDialog(context: context, builder: ((context) => AlertDialog(
-          title: const Text("RetailX License"),
-          content: const Text("Username too short"),
-          actions: [TextButton(onPressed: () { Navigator.of(context).pop();},
-          child: Text("OK"))],
-        )));
-      }
+      // else if(username.length < 5) 
+      // {
+      //   showDialog(context: context, builder: ((context) => AlertDialog(
+      //     title: const Text("RetailX License"),
+      //     content: const Text("Username too short"),
+      //     actions: [TextButton(onPressed: () { Navigator.of(context).pop();},
+      //     child: const Text("OK"))],
+      //   )));
+      // }
 
       else if(password.isEmpty || password == "") 
       {
@@ -179,7 +181,7 @@ class _LoginState extends State<Login> {
           title: const Text("RetailX License"),
           content: const Text("Enter password"),
           actions: [TextButton(onPressed: () { Navigator.of(context).pop(); },
-          child: Text("OK"))],
+          child: const Text("OK"))],
         )));
       }
       else retValue = true;
