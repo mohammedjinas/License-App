@@ -14,42 +14,42 @@ class ChangePassword extends StatefulWidget {
 
 class _ChangePasswordState extends State<ChangePassword> {
   
-  String? old_pass = "", new_pass,retype_pass; 
+  String? oldPass = "", newPass,retypePass; 
   @override
   Widget build(BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
-    return Container(decoration: BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),),),
+    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
               child: Scaffold(backgroundColor: Colors.transparent,
               appBar: AppBar(title: const Text("RetailX License"),),
               body:  Center(
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Container(padding: EdgeInsets.all(10), child: 
+                Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
                   TextField(decoration: InputDecoration(labelText: "Old Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
                   hintText: "Old Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                  onChanged: (value) => old_pass = value,
+                  onChanged: (value) => oldPass = value,
                   ),
                 ),
                 
-                Container(padding: EdgeInsets.all(10), child: 
+                Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
                   TextField(decoration: InputDecoration( labelText: "New Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
                   hintText: "New Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                  onChanged: (value) => new_pass = value,
+                  onChanged: (value) => newPass = value,
                   ),
                 ),
 
-                Container(padding: EdgeInsets.all(10), child: 
+                Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
                   TextField(decoration: InputDecoration( labelText: "Re-type Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
                   hintText: "Re-type Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                  onChanged: (value) => retype_pass = value,
+                  onChanged: (value) => retypePass = value,
                   ),
                 ),
 
-                Container(width: width * 0.6,
+                SizedBox(width: width * 0.6,height: height * 0.05,
                   child: 
                   ElevatedButton(
-                    child: Text("Submit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),),
-                    onPressed: () {changepass();},style: ElevatedButton.styleFrom(backgroundColor: Colors.white)
+                    onPressed: () {changepass();},style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                    child: const Text("Submit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),)
                   ),
                 ),
       ],),
@@ -63,25 +63,26 @@ class _ChangePasswordState extends State<ChangePassword> {
       String? baseURL = prefs.getString("baseURL");
       String? userPass = prefs.getString("password");
       String? username = prefs.getString("username");
+      int? userFlag = prefs.getInt("userFlag");
 
-      if(userPass != old_pass)
+      if(userPass != oldPass)
       {
         showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Existing password you entered is wrong."),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
       }
-      else if(userPass == new_pass)
+      else if(userPass == newPass)
       {
         showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Cannot change password to existing password"),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
       }
-      else if(new_pass != retype_pass)
+      else if(newPass != retypePass)
       {
         showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Password mismatch."),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
       }
       else {
-       final change_pass_params = "$username,$new_pass";
-       final url = Uri.parse("$baseURL/Home/PasswordChange/$change_pass_params");
+       final changePassParams = "$username,$newPass";
+       final url = Uri.parse("$baseURL/Home/PasswordChange/$changePassParams");
        Response changepassResponse = await get(url);
        if(changepassResponse != null)
        {
@@ -91,9 +92,9 @@ class _ChangePasswordState extends State<ChangePassword> {
 
             if(response['loginStatus'] == "1")
             {
-              prefs.setString("password",new_pass!);
+              prefs.setString("password",newPass!);
               showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Password changed successfully."),
-              actions: [TextButton(onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) => HomePage())));}, child: const Text("OK"))],)));
+              actions: [TextButton(onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) => HomePage(userFlag: userFlag!,))));}, child: const Text("OK"))],)));
             }else {
                 showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Password change failed. Please try again."),
                 actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:license/screens/license_screen.dart';
 import 'package:scan/scan.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class ScanScreen extends StatefulWidget {
@@ -23,17 +24,17 @@ class _ScanScreenState extends State<ScanScreen> {
 
     width = w; height = h;
     
-    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"), ),),
+    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover ),),
       child: Scaffold(appBar: AppBar(title:const Text("RetailX License"),),backgroundColor: Colors.transparent,resizeToAvoidBottomInset: false,
         body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, 
           children: [ 
-            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: Text("QR SCAN",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("QR SCAN",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
                     onPressed: () {scanQR(context);},),
         
-            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: Text("IMAGE",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("IMAGE",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
                     onPressed: () {imageQR(context);},),
                     
-            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: Text("LICENSE BY TEXT",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("LICENSE BY TEXT",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
                     onPressed: () {licenseByTextDialog(context);},),
         ],
         ),
@@ -59,31 +60,40 @@ class _ScanScreenState extends State<ScanScreen> {
 
   void licenseByTextDialog(BuildContext context)
   {
-     showDialog(context: context, builder: (context) {
-      return SingleChildScrollView(
-        child: Dialog(insetPadding: EdgeInsets.symmetric(vertical: height * 0.25, horizontal: width * 0.1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Padding(padding: const EdgeInsets.all(10),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Container(padding: const EdgeInsets.only(bottom: 20), child: TextField(decoration: InputDecoration(labelText: "Company Name",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
-            hintText: "Company Name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-            onChanged: (value) => companyName = value,
-            ),),
-      
-          Container(padding: const EdgeInsets.only(bottom: 20), child: TextField(decoration: InputDecoration(labelText: "License Code",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
-            hintText: "License Code",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-            onChanged: (value) => licenseCode = value,
-            ),),
-      
-          Container(child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, 
-            child: Text("Continue",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-                      onPressed: () {licenseByText(context);},),) 
-      
-        ],),),),
-      );
-     });
+    showDialog(barrierDismissible: true, context: context, builder: (context) {
+    return SingleChildScrollView(
+      child: Dialog(insetPadding: EdgeInsets.symmetric(vertical: height * 0.25, horizontal: width * 0.1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(padding: const EdgeInsets.all(10),
+      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Container(padding: const EdgeInsets.only(bottom: 20), child: TextField(decoration: InputDecoration(labelText: "Company Name",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
+          hintText: "Company Name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+          onChanged: (value) => companyName = value,
+          ),),
+    
+        Container(padding: const EdgeInsets.only(bottom: 20), child: TextField(decoration: InputDecoration(labelText: "License Code",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
+          hintText: "License Code",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+          onChanged: (value) => licenseCode = value,
+          ),),
+    
+        Row(
+          children: [ ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+              child: const Text("Cancel",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+                        onPressed: () {Navigator.of(context).pop();},),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+                child: const Text("Continue",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+                          onPressed: () {licenseByText(context);},),
+            ),
+          ],
+        ) 
+    
+      ],),),),
+    );
+    });
   }
 
-  void licenseByText(BuildContext context)
+  void licenseByText(BuildContext context) async
   {
     if(companyName == "" || companyName!.isEmpty)
     {
@@ -96,6 +106,9 @@ class _ScanScreenState extends State<ScanScreen> {
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
     }
     else {
+      String message = "$companyName;Hadaba;$licenseCode;2;;";
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("message", message);
       Navigator.of(context).pop(); 
       Navigator.of(context).push(MaterialPageRoute(builder: ((context) => SetLicense(companyName: companyName, licenseCode: licenseCode,))));
     }

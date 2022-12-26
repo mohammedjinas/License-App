@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -16,7 +14,7 @@ class ReportLicense extends StatefulWidget {
 }
 
 class _ReportLicenseState extends State<ReportLicense> {
-  String? cust_name = "", cust_url = ""; 
+  String? custName = "", custUrl = ""; 
   TextEditingController date = TextEditingController(); 
   DateTime? pickedDate = DateTime.now();
    @override
@@ -29,7 +27,7 @@ class _ReportLicenseState extends State<ReportLicense> {
   Widget build(BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
-    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),),),
+    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
           child: Scaffold(backgroundColor: Colors.transparent,
           appBar: AppBar(title: const Text("RetailX License"),),
           body:  Column(mainAxisAlignment: MainAxisAlignment.center,
@@ -37,14 +35,14 @@ class _ReportLicenseState extends State<ReportLicense> {
               Container(padding: const EdgeInsets.all(10), child: 
                 TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
                 hintText: "Customer name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                onChanged: (value) => cust_name = value,
+                onChanged: (value) => custName = value,
                 ),
               ),
           
             Container(padding: const EdgeInsets.all(10), child: 
               TextField(decoration: InputDecoration( labelText: "URL",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
               hintText: "URL",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-              onChanged: (value) => cust_url = value,
+              onChanged: (value) => custUrl = value,
               ),
             ),
 
@@ -73,7 +71,7 @@ class _ReportLicenseState extends State<ReportLicense> {
 
           const SizedBox(height: 20,),
 
-          Container(width: width * 0.6,
+          SizedBox(width: width * 0.6,
             child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, 
             child: const Text("Submit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
               onPressed: () {setLicense();},),
@@ -84,23 +82,23 @@ class _ReportLicenseState extends State<ReportLicense> {
 
   void setLicense() async
   {
-    if(cust_name == "" || cust_name!.isEmpty)
+    if(custName == "" || custName!.isEmpty)
     {
        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Enter customer name"),
         actions: [TextButton(onPressed: () 
         {Navigator.of(context).pop();}, child: const Text("OK"))],)));
     }
-    else if(cust_name!.length < 5)
+    else if(custName!.length < 5)
     {
        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Customer name too short"),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop(); }, child: const Text("OK"))],)));
     }
-    else if(cust_url == "" || cust_url!.isEmpty)
+    else if(custUrl == "" || custUrl!.isEmpty)
     {
        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Enter customer URL."),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
     }
-    else if(cust_url!.length < 5)
+    else if(custUrl!.length < 5)
     {
        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Customer URL too short."),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
@@ -113,9 +111,10 @@ class _ReportLicenseState extends State<ReportLicense> {
     else {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? baseURL = prefs.getString("baseURL");
+      int? userFlag = prefs.getInt("userFlag");
 
       Map<String,dynamic> map = {
-        'cust_name':cust_name,'cust_url':cust_url,'date':date.text
+        'custName':custName,'custUrl':custUrl,'date':date.text
       };
 
       var postData = jsonEncode(map);
@@ -130,7 +129,7 @@ class _ReportLicenseState extends State<ReportLicense> {
           if(body["result"] == 1)
           {
             showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("License set successfully."),
-            actions: [TextButton(onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) => HomePage())));}, child: const Text("OK"))],)));
+            actions: [TextButton(onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) => HomePage(userFlag: userFlag!,))));}, child: const Text("OK"))],)));
           }
           else {
             showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("License setting failed. Please try again."),
