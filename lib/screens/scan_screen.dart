@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:license/screens/home_screen.dart';
 import 'package:license/screens/license_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:scan/scan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 
 class ScanScreen extends StatefulWidget {
@@ -48,20 +50,50 @@ class _ScanScreenState extends State<ScanScreen> {
         body: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, 
           children: [ 
             ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("QR SCAN",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-                    onPressed: () {scanQR(context);},),
+              onPressed: () async {
+                PermissionStatus camStatus = await Permission.camera.request();
+
+                if(camStatus == PermissionStatus.permanentlyDenied)
+                {
+                  openAppSettings();
+                }
+
+                if (camStatus == PermissionStatus.denied)
+                {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need camera permission to scan QR.")));
+                }
+                if(camStatus == PermissionStatus.granted) {
+                  scanQR(context);
+                }
+                },),
         
             ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("IMAGE",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-                    onPressed: () {imageQR(context);},),
-                    
-            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("LICENSE BY TEXT",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-                    onPressed: () {licenseByTextDialog(context);},),
-        ],
+              onPressed: () async {
+                  PermissionStatus storageStatus = await Permission.storage.request();
+
+                  if(storageStatus == PermissionStatus.permanentlyDenied)
+                  {
+                    openAppSettings();
+                  }
+
+                  if(storageStatus == PermissionStatus.denied)
+                  {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need storage permission to upload QR.")));
+                  }
+
+                  if(storageStatus == PermissionStatus.granted)
+                  {
+                    imageQR(context);
+                  }
+                },),
+              
+                ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("LICENSE BY TEXT",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+                onPressed: () {licenseByTextDialog(context);},),
+            ],
+          ),
         ),
       ),
-  ),
     );
-
-  
   }
 
   void scanQR(BuildContext context) 
