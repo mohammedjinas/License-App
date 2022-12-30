@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:license/screens/changepass_screen.dart';
 import 'package:license/screens/client_details.dart';
+import 'package:license/screens/client_generation_screen.dart';
 import 'package:license/screens/mylicense_screen.dart';
 import 'package:license/screens/report_license_screen.dart';
 import 'package:license/screens/scan_screen.dart';
@@ -47,17 +48,28 @@ class HomePage extends StatelessWidget {
               ButtonWidget(buttonText: "RetailX Reports License", returnWidget: const ReportLicense()),
               
               ButtonWidget(buttonText: "Change Password", returnWidget: const ChangePassword()),
+
+              if(userFlag == 1)
+              ButtonWidget(buttonText: "Client Geneartion", returnWidget: const ClientGeneration()),
         
               ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.white), child: Container(alignment: Alignment.center,width: width *0.6, 
               child: const Text("Exit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-              onPressed: () {SystemNavigator.pop();},),
+              onPressed: () {
+                showDialog<bool>(context: context, builder: (context) => AlertDialog(
+                title: const Text("RetailX License"),
+                content: const Text("Do you want to exit?"),
+                actions: [TextButton(onPressed: () {Navigator.of(context).pop(false);}, child: const Text("No")),
+                TextButton(onPressed: () {SystemNavigator.pop();}, child: const Text("Exit"))],));}
+                
+                // SystemNavigator.pop();},
+                ),
         
-            ],
-          ),
-        )
+              ],
+            ),
+          )
+        ),
       ),
     ),
-  ),
-);    
+  );    
   }
 }

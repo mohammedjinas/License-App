@@ -47,6 +47,7 @@ dependencies:
   auto_size_text_field:
   pdf:
   printing:
+  
 
 dev_dependencies:
   flutter_test:

@@ -2,16 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
+import 'package:license/screens/scan_screen.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:scan/scan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class SetLicense extends StatefulWidget {
-  final String? qrResult, companyName,licenseCode; 
+  final String? qrResult;
 
-  const SetLicense({super.key, this.qrResult = "",this.companyName = "",this.licenseCode = ""});
+  const SetLicense({super.key, this.qrResult = "",});
 
   @override
   State<SetLicense> createState() => _SetLicenseState();
@@ -21,12 +23,15 @@ class _SetLicenseState extends State<SetLicense> {
   TextEditingController txtTrialDays = TextEditingController();
   TextEditingController txtCustomerId = TextEditingController();
   TextEditingController txtRemarks = TextEditingController();
-  TextEditingController txtLicenseName = TextEditingController();
-  TextEditingController txtCompanyName = TextEditingController();
-  TextEditingController txtLicenseType = TextEditingController();
+  // TextEditingController txtLicenseName = TextEditingController();
+  // TextEditingController txtCompanyName = TextEditingController();
+  // TextEditingController txtLicenseType = TextEditingController();
+  // TextEditingController txtComputerName = TextEditingController();
+
+  String?   txtLicenseName = "", txtCompanyName = "", txtLicenseType = "", txtComputerName = "", licenseCode = "";
 
   late Future salesMenList, pdfFile;
-  String selectedValue = "",option = "Insert";
+  String selectedValue = "",option = "Insert",licenseId = "";
   double width = 0.0, height = 0.0;
   int trialDays = 30;
 
@@ -35,7 +40,6 @@ class _SetLicenseState extends State<SetLicense> {
     super.initState();
     salesMenList = getSalesMen();
     pdfFile = generatePdf();
-    
   }
 
   @override
@@ -43,6 +47,7 @@ class _SetLicenseState extends State<SetLicense> {
     super.setState(fn);
     pdfFile = generatePdf();
   }
+
   @override
   Widget build(BuildContext context) {
     
@@ -50,37 +55,55 @@ class _SetLicenseState extends State<SetLicense> {
     height = MediaQuery.of(context).size.height;
     txtTrialDays.text = "$trialDays";
 
+    if(widget.qrResult! != "" && widget.qrResult!.isNotEmpty)
+    {
+      var split = widget.qrResult!.split(";");
+      txtCompanyName = split[0];
+      txtComputerName = split[1];
+      licenseCode = split[2];
+    }
+
     return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)),
-    width: width,
       child: Scaffold(
-        appBar: AppBar(title:const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),),
+        appBar: AppBar(title:const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
+        leading: GestureDetector(
+          child: const Icon(Icons.arrow_back),
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+              return const ScanScreen();
+            },));
+          },
+          ),),
         floatingActionButton:  FloatingActionButton(
           onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) {
             return FutureBuilder(
               future: pdfFile,
               builder: ((context, snapshot) {
-              if(txtLicenseName.text != "" && txtLicenseName.text.isNotEmpty)
+              if(txtLicenseName != "" && txtLicenseName!.isNotEmpty)
               {
                 return PdfPreview(build: (context) => snapshot.data);
               }
-              else {return  Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"))),
+              else {return  Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)),
                 child: AlertDialog(title: const Text("RetailX License"),content: const Text("No license generated to share."),
                 actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),
               );}
             }));
           }))); },
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Colors.black,
           child: const Icon(Icons.picture_as_pdf),
         ),
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: Center(
           child: Column( children: [
+
             Container(padding: const EdgeInsets.all(10), alignment: Alignment.center, 
-            child: Text(widget.companyName!, style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.05),)
+            child: Text(txtCompanyName!, style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.04),)
             ),
+
             Container(padding: EdgeInsets.symmetric(vertical: height * 0.03, horizontal: width * 0.03),
             child: Row(children: [
+
               Container( width:width * 0.4,height: height * 0.05,alignment: Alignment.bottomCenter,
               child: TextField(textAlign: TextAlign.center, 
               keyboardType: TextInputType.number, 
@@ -114,11 +137,11 @@ class _SetLicenseState extends State<SetLicense> {
               children: [
                  const Text("Sales Man: ", style: TextStyle(fontWeight: FontWeight.w600,),),
                  
-                 Container(height: height * 0.04,
+                 Container(height: height * 0.045,
                   decoration: BoxDecoration(
                   border: Border.all(color: Theme.of(context).primaryColor),
                   borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.only(left : 10.0),
+                  padding: const EdgeInsets.symmetric(horizontal : 5.0),
                   child: FutureBuilder(future: salesMenList, 
                   builder: ((context, snapshot) {
                   if(snapshot.hasData)
@@ -134,7 +157,7 @@ class _SetLicenseState extends State<SetLicense> {
                   }
                   else {return DropdownButton(items: null, onChanged: (value) {},hint: const Text("Select sales man"),);}
                   })),
-                 )                 
+                 ),       
               ],
             )
             ),
@@ -143,12 +166,12 @@ class _SetLicenseState extends State<SetLicense> {
             child: Column(children: [
               
               Container( width: width * 0.6, height: height * 0.05,padding: const EdgeInsets.only(bottom: 5),
-                child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, widget.companyName!,"T");}, style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10, ),
+                child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, txtCompanyName!,"T");}, style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10, ),
                 child: const Text("Trial License",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.w600),textAlign: TextAlign.center,)),
               ),
               
               SizedBox(width: width * 0.6, height: height * 0.05,
-                child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, widget.companyName!,"F");},style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10), 
+                child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, txtCompanyName!,"F");},style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10), 
                 child: const Text("Full License",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.w600),textAlign: TextAlign.center,)),
               ),
             ],),),
@@ -158,19 +181,24 @@ class _SetLicenseState extends State<SetLicense> {
             Container(height: 2, width: width, color: Colors.grey[300],),
             
             SizedBox(height: height * 0.05,),
-    
+
+            if(txtLicenseName != "" && txtLicenseName!.isNotEmpty)
             Column(
               children: [
                 
-                Text(txtLicenseType.text,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.05,color: Colors.blueGrey),),
+                Text(txtLicenseType!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.05,color: Colors.blueGrey),),
                 
                 SizedBox(height: height * 0.03 ,),
     
-                Text(txtCompanyName.text,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.08,color: Colors.black87),),
+                Text(txtComputerName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.08,color: Colors.black87),),
                 
                 SizedBox(height: height * 0.03 ,),
     
-                Text(txtLicenseName.text,style: TextStyle(fontWeight: FontWeight.w700, fontSize: width * 0.05,color: Colors.red),),
+                Text(txtLicenseName!,style: TextStyle(fontWeight: FontWeight.w700, fontSize: width * 0.05,color: Colors.red),),
+
+                SizedBox(height: height * 0.03 ,),
+    
+                Text(txtCompanyName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.08,color: Colors.black87),),
               ],
             ),
     
@@ -184,7 +212,7 @@ class _SetLicenseState extends State<SetLicense> {
     return FutureBuilder(
       future: pdfFile,
       builder: ((context, snapshot) {
-      if(txtLicenseName.text != "" && txtLicenseName.text.isNotEmpty)
+      if(txtLicenseName! != "" && txtLicenseName!.isNotEmpty)
       {
         return PdfPreview(build: snapshot.data,);
       }
@@ -220,7 +248,17 @@ class _SetLicenseState extends State<SetLicense> {
                 padding: const EdgeInsets.only(left: 10.0),
                 child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
                   child: const Text("Save",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-                            onPressed: () {Navigator.of(context).pop();},),
+                  onPressed: () {
+                    if(txtLicenseName == "") {
+                      Navigator.of(context).pop();
+                    }
+                    else{
+                      if(txtRemarks.text.isNotEmpty && txtRemarks.text != "" && licenseId != "") {
+                        saveRemarks();
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },),
               ),
             ],
           ) 
@@ -246,7 +284,7 @@ class _SetLicenseState extends State<SetLicense> {
         final List<dynamic> salesMenListFromJson = responseJson['salesMen'];
         if(salesMenListFromJson.isNotEmpty)
         {
-          selectedValue = salesMenListFromJson[0] as String;
+          
           for(int i = 0; i < salesMenListFromJson.length; i ++)
           {
             salesMenList.add(DropdownMenuItem<String>(value: salesMenListFromJson[i] as String,
@@ -254,6 +292,11 @@ class _SetLicenseState extends State<SetLicense> {
             child: Text(salesMenListFromJson[i] as String,
             style: TextStyle(fontWeight: FontWeight.w500, fontStyle: FontStyle.italic, fontSize: height * 0.015),),),),);
           }
+
+          salesMenList.add(DropdownMenuItem<String>(value: "",
+            child: SizedBox(height: height * 0.016, 
+            child: Text("",
+            style: TextStyle(fontWeight: FontWeight.w500, fontStyle: FontStyle.italic, fontSize: height * 0.015),),),));       
 
         }
       }
@@ -271,11 +314,13 @@ class _SetLicenseState extends State<SetLicense> {
     
     if(validateFields(licenseType))
     {
+      if(await checkLicenseCount())
+      {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? baseURL = prefs.getString("baseURL");
       String customerId = txtCustomerId.text;
 
-
+      
       int customerID = int.parse(customerId);
       final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID,$compName");
       Response response = await get(url);
@@ -336,12 +381,13 @@ class _SetLicenseState extends State<SetLicense> {
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
       }
     }
+    }
   }
 
   void generateLicense(String licenseType) async
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? message = prefs.getString("message"), username = prefs.getString("username"), remarks,
+    String? message = widget.qrResult, username = prefs.getString("username"), remarks,
     baseURL = prefs.getString("baseURL");
     String customerId = txtCustomerId.text;
 
@@ -377,10 +423,9 @@ class _SetLicenseState extends State<SetLicense> {
           var jsonData = jsonDecode(response.body);
           
           setState(() {
-            txtLicenseName.text = jsonData['licenceName'];
-            txtCompanyName.text = jsonData['companyName'];
-            txtLicenseType.text = jsonData['licenceType'];
-
+            txtLicenseName = jsonData['licenceName'];
+            txtLicenseType = jsonData['licenceType'];
+            licenseId = jsonData["licenseId"];
           });
         }
         else
@@ -423,25 +468,102 @@ class _SetLicenseState extends State<SetLicense> {
       actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
       return false;
     }
+
+    
     return true;
   }
 
   Future<Uint8List> generatePdf() async
   {
-    final pdfDoc = pw.Document(title: "TEST.pdf",);
+    final pdfDoc = pw.Document();
     Uint8List pdfFile = Uint8List(1);
+    
+    var imageProvider = pw.MemoryImage((await rootBundle.load('assets/images/login_bg.jpg')).buffer.asUint8List());
 
     pdfDoc.addPage(pw.Page(pageFormat: PdfPageFormat.a4,
-      build: (context) => pw.Center(child: pw.Column(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
-        pw.Text(txtCompanyName.text,style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontStyle: pw.FontStyle.italic,fontSize: width * 0.05)),
+      build: (context) => pw.Container(decoration: pw.BoxDecoration(image: pw.DecorationImage(image: imageProvider,fit: pw.BoxFit.contain)),
+        child: pw.Column(mainAxisAlignment: pw.MainAxisAlignment.center, children: [
+        pw.Text(txtCompanyName!.toUpperCase(),style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontStyle: pw.FontStyle.italic,fontSize: width * 0.05)),
         pw.SizedBox(height: 20),
         
-        pw.Text(txtLicenseName.text,style: pw.TextStyle(color: const PdfColor.fromInt(10), fontStyle: pw.FontStyle.italic,fontSize: width * 0.05)),
+        pw.Text(txtComputerName!,style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontStyle: pw.FontStyle.italic,fontSize: width * 0.05)),
+        pw.SizedBox(height: 20),
+        
+        pw.Text(txtLicenseName!,style: pw.TextStyle(fontStyle: pw.FontStyle.italic,fontSize: width * 0.07)),
         pw.SizedBox(height: 20),
       ]),),
     ));
 
     pdfFile = await pdfDoc.save();
     return pdfFile;
+  }
+  
+  void saveRemarks() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? baseURL = prefs.getString("baseURL");
+    final remarks = txtRemarks.text, id = int.parse(licenseId);
+    
+    final url = Uri.parse("$baseURL/Home/UpdateRemarks/$remarks,$id");
+    await get(url);
+  }
+
+  Future<bool> checkLicenseCount() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String customerId = txtCustomerId.text;
+    String? baseURL = prefs.getString("baseURL");
+    
+    final url = Uri.parse("$baseURL/Home/CheckNoOfLicense/$customerId");
+    Response response = await get(url);
+    if(response.statusCode == 200)
+    {
+      if(response.body.toString() == "Limit not reached") {
+        if(await checkLicenseStatus()) {
+          return true;
+        }
+        else{
+          return false;
+        }
+      }
+      else
+      {
+        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(response.body.toString()),
+        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+        return false;
+      }
+    }
+    else{
+      return false;
+    }
+  }
+
+  
+  Future<bool> checkLicenseStatus() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? baseURL = prefs.getString("baseURL");
+
+    final url = Uri.parse("$baseURL/Home/CheckLicenseStatus/$txtComputerName,$licenseCode");
+    Response response = await get(url);
+    if(response.statusCode == 200)
+    {
+      if(response.body.toString() != "Expired")
+      {
+        return await showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(response.body.toString()),
+        actions: [TextButton(onPressed: () {Navigator.of(context).pop(true);}, child: const Text("OK"))],)));
+      }
+      else{
+        return true;
+      }
+    }
+    else
+    {
+      return await showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("License status check failed. Do you want to proceed?"),
+        actions: [
+          TextButton(onPressed: () {Navigator.of(context).pop(true);}, child: const Text("Yes")),
+          TextButton(onPressed: () {Navigator.of(context).pop(false); }, child: const Text("No"))
+          ],)));
+    }
   }
 }

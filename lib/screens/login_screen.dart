@@ -16,7 +16,7 @@ class _LoginState extends State<Login> {
 
   String baseURL = "http://hadabaoffice.dyndns.tv:99";
   late String username = "",password = "";
-  bool isChecked = false;
+  bool isChecked = false, isLogged = false;
   @override
   Widget build(BuildContext context) 
   {
@@ -77,7 +77,7 @@ class _LoginState extends State<Login> {
                     SizedBox(width: width * 0.6, height: height * 0.05, 
                       child: 
                       ElevatedButton(
-                        onPressed: () => login(),style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                        onPressed: () { const CircularProgressIndicator(); login();},style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
                         child: const Text("Log In",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),),
                       ),
                     ),
@@ -127,6 +127,13 @@ class _LoginState extends State<Login> {
         prefs.setString("password", password);
         prefs.setBool("isLogged", true);
         prefs.setInt("userFlag", userFlag);
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text("Logged In Successfully.",style: TextStyle(color: Colors.black),),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.grey[350],
+        ));
 
         Navigator.of(context).push(MaterialPageRoute(builder: (_) {return HomePage(userFlag: userFlag,);} ));
        }

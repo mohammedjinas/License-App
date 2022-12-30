@@ -35,7 +35,7 @@ class _MyLicenseState extends State<MyLicense> {
     width = w; height = h; 
     return Scaffold(appBar: AppBar(title: const Text("RetailX License"),),
       body: SingleChildScrollView(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
+        child: Column(children: [
           Row(children: [
             Padding(
               padding: const EdgeInsets.only(top: 10,left: 10),
@@ -94,7 +94,7 @@ class _MyLicenseState extends State<MyLicense> {
             }
             else 
             {
-              const CircularProgressIndicator();
+              clientsList = const CircularProgressIndicator();
             }
           }
           return clientsList;
