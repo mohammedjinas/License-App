@@ -29,6 +29,7 @@ class _SetLicenseState extends State<SetLicense> {
   String selectedValue = "",option = "Insert",licenseId = "";
   double width = 0.0, height = 0.0;
   int trialDays = 30;
+  bool licenseExist = false;
 
   FocusNode customerIdFocus = FocusNode();
   FocusNode trialDaysFocus = FocusNode();
@@ -333,9 +334,9 @@ class _SetLicenseState extends State<SetLicense> {
     
     if(validateFields(licenseType))
     {
-      if(await checkLicenseCount())
+      if(licenseExist)
       {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
       String? baseURL = prefs.getString("baseURL");
       String customerId = txtCustomerId.text;
 
@@ -399,6 +400,75 @@ class _SetLicenseState extends State<SetLicense> {
         showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("HTTP request failed. Please try again."),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
       }
+      }
+      else{
+        if(await checkLicenseCount())
+        {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String? baseURL = prefs.getString("baseURL");
+        String customerId = txtCustomerId.text;
+
+        
+        int customerID = int.parse(customerId);
+        final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID,$compName");
+        Response response = await get(url);
+        if(response.statusCode == 200)
+        {
+          if(response.body.isNotEmpty)
+          {
+            var jsonData = jsonDecode(response.body);
+            if(jsonData['result'] == 1)
+            {
+              if(jsonData['message'] == "Exist with diff name")
+              {
+                showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),
+                content: const Text("Client already exist with a different name.\nDo you wish to continue?"),
+                actions: [
+
+                  TextButton(onPressed: () {Navigator.of(context).pop(); return; }, child: const Text("No")),
+
+                  TextButton(onPressed: () {Navigator.of(context).pop();
+                    showDialog(context: context, builder: ((context) => AlertDialog(
+                      title: const Text("RetailX License"),
+                      content: const Text("Do you wish to update client name?"),
+                      actions: [
+                        TextButton(onPressed: () {option = "Update"; generateLicense(licenseType); Navigator.of(context).pop();}, child: const Text("Yes")),
+
+                        TextButton(onPressed: () {
+                          Navigator.of(context).pop(); return;
+                        }, child: const Text("No"))
+                      ],
+                    )));
+                  }, child: const Text("Yes"))
+                  ],)));
+              }
+              else 
+              {
+                generateLicense(licenseType);
+              }
+            }
+            else if(jsonData['result'] == 2)
+            {
+              generateLicense(licenseType);
+            }
+            else
+            {
+              showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Checking existing customer failed.\nPlease try again."),
+              actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+            }
+          }
+          else 
+          {
+            showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Could not fetch data. Please try again."),
+            actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+          }
+        }
+        else 
+        {
+          showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("HTTP request failed. Please try again."),
+          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+        }
+      }
     }
     }
   }
@@ -445,6 +515,7 @@ class _SetLicenseState extends State<SetLicense> {
             txtLicenseName = jsonData['licenceName'];
             txtLicenseType = jsonData['licenceType'];
             licenseId = jsonData["licenseId"];
+            licenseExist = true;
           });
         }
         else
@@ -570,10 +641,12 @@ class _SetLicenseState extends State<SetLicense> {
     {
       if(response.body.toString() != "Expired")
       {
+        licenseExist = true;
         return await showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(response.body.toString()),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop(true);}, child: const Text("OK"))],)));
       }
       else{
+        licenseExist = false;
         return true;
       }
     }
