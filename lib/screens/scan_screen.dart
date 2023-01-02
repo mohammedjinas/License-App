@@ -17,9 +17,9 @@ class ScanScreen extends StatefulWidget {
 
 
 class _ScanScreenState extends State<ScanScreen> {
-  String? imagePath, companyName = "",licenseCode = "";
+  String? imagePath, companyName = "",licenseCode = "",txtSystemName = "";
   double width = 0.0, height = 0.0;
-  TextEditingController txtSystemName = TextEditingController();
+  // TextEditingController txtSystemName = TextEditingController();
   int userFlag = 0;
   
   @override
@@ -140,7 +140,7 @@ class _ScanScreenState extends State<ScanScreen> {
                    child: TextField(textAlign: TextAlign.center,
                     decoration: InputDecoration(counterText: "", hintText: "System name",hintStyle:const TextStyle(color: Colors.black87), focusColor: Colors.blue,
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                    controller: txtSystemName,
+                    onChanged: ((value) => txtSystemName = value),
                     ),
                  ),        
     
@@ -152,7 +152,7 @@ class _ScanScreenState extends State<ScanScreen> {
               padding: const EdgeInsets.only(left: 5.0),
               child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
                 child: const Text("Continue",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-                          onPressed: () {licenseByText(context);},),
+                          onPressed: () {licenseByText();},),
             ),
           ],
         ) 
@@ -162,7 +162,7 @@ class _ScanScreenState extends State<ScanScreen> {
     });
   }
 
-  void licenseByText(BuildContext context) async
+  void licenseByText() async
   {
     if(companyName == "" || companyName!.isEmpty)
     {
@@ -176,15 +176,14 @@ class _ScanScreenState extends State<ScanScreen> {
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
         return;
     }
-    if(txtSystemName.text.isEmpty || txtSystemName.text == "")
+    if(txtSystemName == ""|| txtSystemName!.isEmpty )
     {
       showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Please provide a system name."),
       actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
         return;
     }
     else {
-      String sysName = txtSystemName.text;
-      String message = "$companyName;$sysName;$licenseCode;2;;";
+      String message = "$companyName+$txtSystemName+$licenseCode";
       Navigator.of(context).pop(); 
       Navigator.of(context).push(MaterialPageRoute(builder: ((context) => SetLicense(qrResult: message,))));
     }

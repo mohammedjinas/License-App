@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:license/screens/home_screen.dart';
@@ -16,13 +17,27 @@ class _LoginState extends State<Login> {
 
   String baseURL = "http://hadabaoffice.dyndns.tv:99";
   late String username = "",password = "";
-  bool isChecked = false, isLogged = false;
+  bool isChecked = false, isLogged = false, loginPressed = false;
+  int userFlag = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.delayed(Duration.zero, () {
+    getUserFlag();
+    checkLoginStatus();
+    });
+  }
   @override
   Widget build(BuildContext context) 
   {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-
+    if(isLogged)
+    {
+      return HomePage(userFlag: userFlag);
+    }
     return Container(
       decoration: const BoxDecoration(
       image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)
@@ -77,8 +92,19 @@ class _LoginState extends State<Login> {
                     SizedBox(width: width * 0.6, height: height * 0.05, 
                       child: 
                       ElevatedButton(
-                        onPressed: () { const CircularProgressIndicator(); login();},style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                        child: const Text("Log In",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),),
+                        onPressed: () { 
+                          setState(() {
+                            loginPressed = true;
+                            login();
+                          });
+                          
+                          },style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                        child: loginPressed ?  Row(crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [ 
+                            const Text("Logging in..."),
+                            CircularProgressIndicator(color: Colors.blue[150],),
+                          ],
+                        ) : const Text("Log In",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),)
                       ),
                     ),
                   ],
@@ -111,53 +137,78 @@ class _LoginState extends State<Login> {
   void login() async
   {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(checkLoginDetails() == true)
-    {
-    final loginData = '$username,$password';
-    final url = Uri.parse(baseURL + "/Home/LoginData/" + loginData);
-    Response loginResponse = await get(url);
-      if(loginResponse.body != null)
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+
+      if(checkLoginDetails() == true)      
       {
-       final body = jsonDecode(loginResponse.body);
-       if(body['loginStatus'] == "1") 
-       {
-        int userFlag = body['userFlag'];
-        prefs.setString("baseURL", baseURL);
-        prefs.setString("username", username);
-        prefs.setString("password", password);
-        prefs.setBool("isLogged", true);
-        prefs.setInt("userFlag", userFlag);
+        final loginData = '$username,$password';
+        final url = Uri.parse("$baseURL/Home/LoginData/$loginData");
+        Response loginResponse = await get(url);
+          if(loginResponse.statusCode == 200)
+          {
+          final body = jsonDecode(loginResponse.body);
+          if(body['loginStatus'] == "1") 
+          {
+            int userFlag = body['userFlag'];
+            prefs.setString("baseURL", baseURL);
+            prefs.setString("username", username);
+            prefs.setString("password", password);
+            prefs.setBool("isLogged", true);
+            prefs.setInt("userFlag", userFlag);
 
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text("Logged In Successfully.",style: TextStyle(color: Colors.black),),
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.grey[350],
-        ));
+            setState(() {
+              loginPressed = false;
+            });
 
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) {return HomePage(userFlag: userFlag,);} ));
-       }
-       else
-       {
-        prefs.setBool("isLogged", false);
+            // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            //   content: const Text("Logged In Successfully.",style: TextStyle(color: Colors.black),),
+            //   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+            //   behavior: SnackBarBehavior.floating,
+            //   backgroundColor: Colors.grey[350],
+            // ));
 
-        showDialog(context: context,
-        builder: (context) => AlertDialog(title: const Text("RetailX License"),
-        content: Text(body['loginMesage']),
-        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),);
-       }
-      }
-      else 
-      {
-        prefs.setBool("isLogged", false);
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) {return HomePage(userFlag: userFlag,);} ));
+          }
+          else
+          {
+            prefs.setBool("isLogged", false);
 
-        showDialog(context: context,
-        builder: (context) => AlertDialog(title: const Text("RetailX License"),
-        content: const Text("API Error!"),
-        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),);
-      }
+            showDialog(context: context,
+            builder: (context) => AlertDialog(title: const Text("RetailX License"),
+            content: Text(body['loginMesage']),
+            actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),);
+
+            setState(() {
+              loginPressed = false;
+            });
+          }
+          }
+          else 
+          {
+            prefs.setBool("isLogged", false);
+
+            showDialog(context: context,
+            builder: (context) => AlertDialog(title: const Text("RetailX License"),
+            content: const Text("HTTP request Error!"),
+            actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),);
+
+            setState(() {
+              loginPressed = false;
+            });
+          }
+      } 
     }
   }
+    on SocketException catch(_)
+    {
+      showDialog(context: context,
+            builder: (context) => AlertDialog(title: const Text("RetailX License"),
+            content: const Text("Please check your internet connection before trying again."),
+            actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),);
+    }
+}
 
   bool checkLoginDetails()
   {
@@ -172,16 +223,6 @@ class _LoginState extends State<Login> {
         )));
       }
 
-      // else if(username.length < 5) 
-      // {
-      //   showDialog(context: context, builder: ((context) => AlertDialog(
-      //     title: const Text("RetailX License"),
-      //     content: const Text("Username too short"),
-      //     actions: [TextButton(onPressed: () { Navigator.of(context).pop();},
-      //     child: const Text("OK"))],
-      //   )));
-      // }
-
       else if(password.isEmpty || password == "") 
       {
         showDialog(context: context, builder: ((context) => AlertDialog(
@@ -195,4 +236,19 @@ class _LoginState extends State<Login> {
 
       return retValue;
   }
+
+  
+void checkLoginStatus() async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    isLogged = prefs.getBool("isLogged")!;
+    setState(() {});
+  }
+
+  void getUserFlag() async
+{
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  userFlag = prefs.getInt("userFlag")!;
+}
+
 }
