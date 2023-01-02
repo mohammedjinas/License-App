@@ -7,6 +7,7 @@ import 'package:license/screens/mylicense_screen.dart';
 import 'package:license/screens/report_license_screen.dart';
 import 'package:license/screens/scan_screen.dart';
 import 'package:license/widgets/button_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key,required this.userFlag});
@@ -31,7 +32,11 @@ class HomePage extends StatelessWidget {
             return Future.value(false);
           }
       },child: Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
-      child: Scaffold(appBar: AppBar(title: const Text("RetailX License")),resizeToAvoidBottomInset: false,backgroundColor: Colors.transparent,
+      child: Scaffold(appBar: AppBar(title: const Text("RetailX License"),leading: AlertDialog(
+                title: const Text("RetailX License"),
+                content: const Text("Do you want to exit?"),
+                actions: [TextButton(onPressed: () {Navigator.of(context).pop(false);}, child: const Text("No")),
+                TextButton(onPressed: () { SystemNavigator.pop();}, child: const Text("Exit"))],),),resizeToAvoidBottomInset: false,backgroundColor: Colors.transparent,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -57,11 +62,9 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 showDialog<bool>(context: context, builder: (context) => AlertDialog(
                 title: const Text("RetailX License"),
-                content: const Text("Do you want to exit?"),
+                content: const Text("Do you want to logout and exit?"),
                 actions: [TextButton(onPressed: () {Navigator.of(context).pop(false);}, child: const Text("No")),
-                TextButton(onPressed: () {SystemNavigator.pop();}, child: const Text("Exit"))],));}
-                
-                // SystemNavigator.pop();},
+                TextButton(onPressed: () {logOut(); SystemNavigator.pop();}, child: const Text("Exit"))],));}
                 ),
         
               ],
@@ -71,5 +74,11 @@ class HomePage extends StatelessWidget {
       ),
     ),
   );    
+  }
+
+  void logOut() async
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("isLogged",false);
   }
 }

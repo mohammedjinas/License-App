@@ -35,7 +35,7 @@ class _ClientGenerationState extends State<ClientGeneration> {
 
     return Scaffold(
       appBar: AppBar(title:const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.transparent,
       body: Container(padding:  EdgeInsets.only(top: height * 0.05),
       height: height,
@@ -56,7 +56,7 @@ class _ClientGenerationState extends State<ClientGeneration> {
             children: [
               Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer ID",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
                 hintText: "Customer ID",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
-                controller: clientId,maxLength: 5,
+                controller: clientId,
                 ),),
               
                 SizedBox(height: width * 0.1, width: width * 0.1,
@@ -178,10 +178,11 @@ class _ClientGenerationState extends State<ClientGeneration> {
     if(response.statusCode == 200)
     {
       final systemListResponse = jsonDecode(response.body);
+      noOfLicense.text = systemListResponse["noOfLicense"].toString() ;
       if(systemListResponse["result"] == 1)
       {
         clientName = systemListResponse["clientName"];
-        noOfLicense.text = systemListResponse["noOfLicense"].toString() ;
+        
         if(systemListResponse["systemNames"] != null) {
           final List<dynamic> responseList = systemListResponse["systemNames"];
         

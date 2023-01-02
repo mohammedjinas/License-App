@@ -22,10 +22,6 @@ class _SetLicenseState extends State<SetLicense> {
   TextEditingController txtTrialDays = TextEditingController();
   TextEditingController txtCustomerId = TextEditingController();
   TextEditingController txtRemarks = TextEditingController();
-  // TextEditingController txtLicenseName = TextEditingController();
-  // TextEditingController txtCompanyName = TextEditingController();
-  // TextEditingController txtLicenseType = TextEditingController();
-  // TextEditingController txtComputerName = TextEditingController();
 
   String?   txtLicenseName = "", txtCompanyName = "", txtLicenseType = "", txtComputerName = "", licenseCode = "";
 
@@ -34,11 +30,33 @@ class _SetLicenseState extends State<SetLicense> {
   double width = 0.0, height = 0.0;
   int trialDays = 30;
 
+  FocusNode customerIdFocus = FocusNode();
+  FocusNode trialDaysFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
     salesMenList = getSalesMen();
     pdfFile = generatePdf();
+
+    customerIdFocus.addListener (() {
+      if (!customerIdFocus.hasFocus && txtCustomerId.text.isNotEmpty && txtCustomerId.text != "") {
+      checkLicenseStatus();
+      }
+    });
+
+    trialDaysFocus.addListener(() {
+      if(!trialDaysFocus.hasFocus && txtTrialDays.text.isNotEmpty && txtTrialDays.text != "")
+      {
+        if(int.parse(txtTrialDays.text) > 60)
+        {
+          showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Trial days cannot be more than 60 days"),
+          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+          trialDaysFocus.requestFocus();
+          return;
+        }
+      }
+    });
   }
 
   @override
@@ -56,7 +74,7 @@ class _SetLicenseState extends State<SetLicense> {
 
     if(widget.qrResult! != "" && widget.qrResult!.isNotEmpty)
     {
-      var split = widget.qrResult!.split(";");
+      var split = widget.qrResult!.split("+");
       txtCompanyName = split[0];
       txtComputerName = split[1];
       licenseCode = split[2];
@@ -110,6 +128,7 @@ class _SetLicenseState extends State<SetLicense> {
               decoration: InputDecoration(labelText: "Customer ID",hintText: "Customer ID",hintStyle:const TextStyle(color: Colors.black87), focusColor: Colors.blue,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
                   controller: txtCustomerId,
+                  focusNode: customerIdFocus,
                   ),),
     
               Container(width:width * 0.4,height: height * 0.05, padding: EdgeInsets.only(left: width * 0.02),alignment: Alignment.center,
@@ -121,6 +140,7 @@ class _SetLicenseState extends State<SetLicense> {
                   inputFormatters: [LengthLimitingTextInputFormatter(2)],
                   onChanged: ((value) { if(value.isNotEmpty || value != "") trialDays = int.parse(value);}),
                   controller: txtTrialDays,
+                  focusNode: trialDaysFocus,
                   ),
               ),
     
@@ -398,11 +418,11 @@ class _SetLicenseState extends State<SetLicense> {
 
       if(licenseType == "T")
       {
-        message = "$message;T$trialDays;$username;$customerId;$selectedValue";
+        message = "$message+T$trialDays+$username+$customerId+$selectedValue";
       }
       else if(licenseType == "F")
       {
-        message = "$message;F;$username;$customerId;$selectedValue";
+        message = "$message+F+$username+$customerId+$selectedValue";
       }
 
       remarks = txtRemarks.text;
@@ -488,7 +508,7 @@ class _SetLicenseState extends State<SetLicense> {
         pw.Text(txtComputerName!,style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontStyle: pw.FontStyle.italic,fontSize: width * 0.05)),
         pw.SizedBox(height: 20),
         
-        pw.Text(txtLicenseName!,style: pw.TextStyle(fontStyle: pw.FontStyle.italic,fontSize: width * 0.07)),
+        pw.Text(txtLicenseName!,style: pw.TextStyle(fontStyle: pw.FontStyle.italic,fontSize: width * 0.06)),
         pw.SizedBox(height: 20),
       ]),),
     ));
@@ -518,12 +538,13 @@ class _SetLicenseState extends State<SetLicense> {
     if(response.statusCode == 200)
     {
       if(response.body.toString() == "Limit not reached") {
-        if(await checkLicenseStatus()) {
-          return true;
-        }
-        else{
-          return false;
-        }
+        // if(await checkLicenseStatus()) {
+        //   return true;
+        // }
+        // else{
+        //   return false;
+        // }
+        return true;
       }
       else
       {
@@ -542,8 +563,8 @@ class _SetLicenseState extends State<SetLicense> {
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? baseURL = prefs.getString("baseURL");
-
-    final url = Uri.parse("$baseURL/Home/CheckLicenseStatus/$txtComputerName,$licenseCode");
+    String customerId = txtCustomerId.text;
+    final url = Uri.parse("$baseURL/Home/CheckLicenseStatus/$txtComputerName,$licenseCode,$customerId");
     Response response = await get(url);
     if(response.statusCode == 200)
     {
