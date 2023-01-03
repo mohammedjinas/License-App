@@ -10,7 +10,7 @@ class ButtonWidget extends StatelessWidget {
     
   double width = MediaQuery.of(context).size.width;
   return ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, 
-          child: Text(buttonText,style: const TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+          child: Text(buttonText,style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500, fontSize: width * 0.04),)),
           onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(builder: (_) { return returnWidget;})
         );                
