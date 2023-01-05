@@ -26,11 +26,10 @@ class _SetLicenseState extends State<SetLicense> {
   String?   txtLicenseName = "", txtCompanyName = "", txtLicenseType = "", txtComputerName = "", licenseCode = "";
 
   late Future salesMenList, pdfFile;
-  String selectedValue = "",option = "Insert",licenseId = "";
+  String selectedValue = "",option = "Update",licenseId = "",splitter = "";
   double width = 0.0, height = 0.0;
   int trialDays = 30;
   bool licenseExist = false;
-
   FocusNode customerIdFocus = FocusNode();
   FocusNode trialDaysFocus = FocusNode();
 
@@ -41,7 +40,9 @@ class _SetLicenseState extends State<SetLicense> {
     pdfFile = generatePdf();
 
     customerIdFocus.addListener (() {
+      licenseExist = false;
       if (!customerIdFocus.hasFocus && txtCustomerId.text.isNotEmpty && txtCustomerId.text != "") {
+
       checkLicenseStatus();
       }
     });
@@ -75,7 +76,17 @@ class _SetLicenseState extends State<SetLicense> {
 
     if(widget.qrResult! != "" && widget.qrResult!.isNotEmpty)
     {
-      var split = widget.qrResult!.split("+");
+      
+      if(widget.qrResult!.contains("+"))
+      {
+        splitter = "+";
+      }
+      
+      if(widget.qrResult!.contains(";"))
+      {
+        splitter = ";";
+      }
+      var split = widget.qrResult!.split(splitter);
       txtCompanyName = split[0];
       txtComputerName = split[1];
       licenseCode = split[2];
@@ -218,7 +229,7 @@ class _SetLicenseState extends State<SetLicense> {
 
                 SizedBox(height: height * 0.03 ,),
     
-                Text(txtCompanyName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.08,color: Colors.black87),),
+                Text(txtCompanyName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.05,color: Colors.black87),),
               ],
             ),
     
@@ -337,69 +348,69 @@ class _SetLicenseState extends State<SetLicense> {
       if(licenseExist)
       {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseURL = prefs.getString("baseURL");
-      String customerId = txtCustomerId.text;
+        String? baseURL = prefs.getString("baseURL");
+        String customerId = txtCustomerId.text;
 
-      
-      int customerID = int.parse(customerId);
-      final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID,$compName");
-      Response response = await get(url);
-      if(response.statusCode == 200)
-      {
-        if(response.body.isNotEmpty)
+        
+        int customerID = int.parse(customerId);
+        final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID,$compName");
+        Response response = await get(url);
+        if(response.statusCode == 200)
         {
-          var jsonData = jsonDecode(response.body);
-          if(jsonData['result'] == 1)
+          if(response.body.isNotEmpty)
           {
-            if(jsonData['message'] == "Exist with diff name")
+            var jsonData = jsonDecode(response.body);
+            if(jsonData['result'] == 1)
             {
-              showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),
-              content: const Text("Client already exist with a different name.\nDo you wish to continue?"),
-              actions: [
+              if(jsonData['message'] == "Exist with diff name")
+              {
+                showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),
+                content: const Text("Client already exist with a different name.\nDo you wish to continue?"),
+                actions: [
 
-                TextButton(onPressed: () {Navigator.of(context).pop(); return; }, child: const Text("No")),
+                  TextButton(onPressed: () {Navigator.of(context).pop(); return; }, child: const Text("No")),
 
-                TextButton(onPressed: () {Navigator.of(context).pop();
-                  showDialog(context: context, builder: ((context) => AlertDialog(
-                    title: const Text("RetailX License"),
-                    content: const Text("Do you wish to update client name?"),
-                    actions: [
-                      TextButton(onPressed: () {option = "Update"; generateLicense(licenseType); Navigator.of(context).pop();}, child: const Text("Yes")),
+                  TextButton(onPressed: () {Navigator.of(context).pop();
+                    showDialog(context: context, builder: ((context) => AlertDialog(
+                      title: const Text("RetailX License"),
+                      content: const Text("Do you wish to update client name?"),
+                      actions: [
+                        TextButton(onPressed: () {option = "Update"; generateLicense(licenseType); Navigator.of(context).pop();}, child: const Text("Yes")),
 
-                      TextButton(onPressed: () {
-                        Navigator.of(context).pop(); return;
-                      }, child: const Text("No"))
-                    ],
-                  )));
-                }, child: const Text("Yes"))
-                ],)));
+                        TextButton(onPressed: () {
+                          Navigator.of(context).pop(); return;
+                        }, child: const Text("No"))
+                      ],
+                    )));
+                  }, child: const Text("Yes"))
+                  ],)));
+              }
+              else 
+              {
+                generateLicense(licenseType);
+              }
             }
-            else 
+            else if(jsonData['result'] == 2)
             {
               generateLicense(licenseType);
             }
+            else
+            {
+              showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Checking existing customer failed.\nPlease try again."),
+              actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+            }
           }
-          else if(jsonData['result'] == 2)
+          else 
           {
-            generateLicense(licenseType);
-          }
-          else
-          {
-            showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Checking existing customer failed.\nPlease try again."),
+            showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Could not fetch data. Please try again."),
             actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
           }
         }
         else 
         {
-          showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Could not fetch data. Please try again."),
+          showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("HTTP request failed. Please try again."),
           actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
         }
-      }
-      else 
-      {
-        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("HTTP request failed. Please try again."),
-        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
-      }
       }
       else{
         if(await checkLicenseCount())
@@ -488,11 +499,11 @@ class _SetLicenseState extends State<SetLicense> {
 
       if(licenseType == "T")
       {
-        message = "$message+T$trialDays+$username+$customerId+$selectedValue";
+        message = "$message$splitter$licenseType$trialDays$splitter$username$splitter$customerId$splitter$selectedValue";
       }
       else if(licenseType == "F")
       {
-        message = "$message+F+$username+$customerId+$selectedValue";
+        message = "$message$splitter$licenseType$splitter$username$splitter$customerId$splitter$selectedValue";
       }
 
       remarks = txtRemarks.text;
@@ -507,6 +518,7 @@ class _SetLicenseState extends State<SetLicense> {
       http.Response response = await http.post(url,headers: {"Content-Type": "application/json"},body: jsonPostdata);
       if(response.statusCode == 200)
       {
+        try{
         if(response.body.isNotEmpty)
         {
           var jsonData = jsonDecode(response.body);
@@ -515,10 +527,16 @@ class _SetLicenseState extends State<SetLicense> {
             txtLicenseName = jsonData['licenceName'];
             txtLicenseType = jsonData['licenceType'];
             licenseId = jsonData["licenseId"];
-            licenseExist = true;
+            licenseExist = false;
           });
         }
         else
+        {
+          showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("License generation failed.\n\nPlease check before trying again"),
+          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+          return;
+        }
+        }on Exception catch(_)
         {
           showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("License generation failed.\n\nPlease check before trying again"),
           actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
@@ -636,7 +654,7 @@ class _SetLicenseState extends State<SetLicense> {
     String? baseURL = prefs.getString("baseURL");
     String customerId = txtCustomerId.text;
     final url = Uri.parse("$baseURL/Home/CheckLicenseStatus/$txtComputerName,$licenseCode,$customerId");
-    Response response = await get(url);
+    Response response = await get(url); 
     if(response.statusCode == 200)
     {
       if(response.body.toString() != "Expired")
@@ -656,7 +674,7 @@ class _SetLicenseState extends State<SetLicense> {
         actions: [
           TextButton(onPressed: () {Navigator.of(context).pop(true);}, child: const Text("Yes")),
           TextButton(onPressed: () {Navigator.of(context).pop(false); }, child: const Text("No"))
-          ],)));
+        ],)));
     }
   }
 }
