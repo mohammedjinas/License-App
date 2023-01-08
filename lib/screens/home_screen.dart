@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:license/screens/changepass_screen.dart';
@@ -150,7 +152,9 @@ class HomePage extends StatelessWidget {
                           TextButton(
                             onPressed: () 
                             {
-                              logOut(); SystemNavigator.pop();
+                              logOut();
+                              exit(0); 
+                              // SystemNavigator.pop();
                             }, 
                             child: const Text("Exit")
                           )
