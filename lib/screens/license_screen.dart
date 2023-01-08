@@ -353,7 +353,7 @@ class _SetLicenseState extends State<SetLicense> {
 
         
         int customerID = int.parse(customerId);
-        final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID,$compName");
+        final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID/$compName");
         Response response = await get(url);
         if(response.statusCode == 200)
         {
@@ -421,7 +421,7 @@ class _SetLicenseState extends State<SetLicense> {
 
         
         int customerID = int.parse(customerId);
-        final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID,$compName");
+        final url = Uri.parse("$baseURL/Home/CheckCustomer/$customerID/$compName");
         Response response = await get(url);
         if(response.statusCode == 200)
         {
