@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:license/screens/changepass_screen.dart';
 import 'package:license/screens/client_details.dart';
 import 'package:license/screens/client_generation_screen.dart';
+import 'package:license/screens/login_screen.dart';
 import 'package:license/screens/mylicense_screen.dart';
 import 'package:license/screens/report_license_screen.dart';
 import 'package:license/screens/scan_screen.dart';
@@ -39,7 +40,7 @@ class HomePage extends StatelessWidget {
               TextButton(
                 onPressed: () 
                 {
-                  SystemNavigator.pop();
+                  exit(0);
                 }, 
                 child: const Text("Exit")
               )
@@ -63,20 +64,20 @@ class HomePage extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             title: const Text("RetailX License"),
-            leading: AlertDialog(
-              title: const Text("RetailX License"),
-              content: const Text("Do you want to exit?"),
-              actions: [
-                TextButton(
-                  onPressed: () {Navigator.of(context).pop(false);}, 
-                  child: const Text("No")
-                ),
-                TextButton(
-                  onPressed: () { SystemNavigator.pop();}, 
-                  child: const Text("Exit")
-                )
-              ],
-            ),
+            // leading: AlertDialog(
+            //   title: const Text("RetailX License"),
+            //   content: const Text("Do you want to exit?"),
+            //   actions: [
+            //     TextButton(
+            //       onPressed: () {Navigator.of(context).pop(false);}, 
+            //       child: const Text("No")
+            //     ),
+            //     TextButton(
+            //       onPressed: () { SystemNavigator.pop();}, 
+            //       child: const Text("Exit")
+            //     )
+            //   ],
+            // ),
           ),
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
@@ -153,7 +154,7 @@ class HomePage extends StatelessWidget {
                             onPressed: () 
                             {
                               logOut();
-                              exit(0); 
+                              Navigator.of(context).push(MaterialPageRoute(builder: ((context) => Login())));
                               // SystemNavigator.pop();
                             }, 
                             child: const Text("Exit")
