@@ -15,7 +15,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
 
-  String baseURL = "http://hadabaoffice.dyndns.tv:99";
+  String baseURL = "http://hadabaoffice.dyndns.tv:96";
   late String username = "",password = "";
   bool isChecked = false, isLogged = false, loginPressed = false;
   int userFlag = 0;
@@ -43,7 +43,8 @@ class _LoginState extends State<Login> {
       image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)
       ),
       child: Scaffold(
-        appBar: AppBar(title: const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),),
+        appBar: AppBar(title: const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
+        automaticallyImplyLeading: false,),
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: Stack(
@@ -121,7 +122,7 @@ class _LoginState extends State<Login> {
   {
     if(isChecked)
     {
-      baseURL = "http://192.168.1.127:1111";
+      baseURL = "http://192.168.1.100:96";
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: const Text("URL set to Office",style: TextStyle(color: Colors.black),),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
@@ -130,7 +131,7 @@ class _LoginState extends State<Login> {
     ));
     }
     else {
-      baseURL = "http://hadabaoffice.dyndns.tv:99";
+      baseURL = "http://hadabaoffice.dyndns.tv:96";
     }
   }
 
