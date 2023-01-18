@@ -321,6 +321,7 @@ class MySearchDelegate extends SearchDelegate
     IconButton(onPressed: (){
       close(context, null);
     }, icon: Icon(Icons.arrow_back));
+    return null;
   }
 
   @override
