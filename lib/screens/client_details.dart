@@ -34,6 +34,7 @@ class _ClientDetialsState extends State<ClientDetials> {
             setState(() {
               // clientName = selectedItem.name.toUpperCase();
               customerId.text = selectedItem.customerId.toString();
+              resultText.text = "";
               // noOfLicense.text = selectedItem.noOfLicense.toLowerCase();
             });
           }, icon: Icon(Icons.search))
