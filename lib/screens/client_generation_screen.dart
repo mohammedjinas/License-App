@@ -259,8 +259,6 @@ class _ClientGenerationState extends State<ClientGeneration> {
     Response response = await get(url);
     final retString = response.body.toString();
 
-    
-    // String retString = resultObj["message"].toString();
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content:   Text(retString,style:  const TextStyle(color: Colors.black),),

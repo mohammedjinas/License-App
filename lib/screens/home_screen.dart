@@ -118,7 +118,7 @@ class HomePage extends StatelessWidget {
 
                 if(userFlag == 1)
                 ButtonWidget(
-                  buttonText: "Client Geneartion", 
+                  buttonText: "Client Generation", 
                   returnWidget: const ClientGeneration()
                 ),
           
