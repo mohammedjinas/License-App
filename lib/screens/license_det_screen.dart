@@ -23,7 +23,7 @@ class _LicenseDetailState extends State<LicenseDetail> {
               Container(padding: const EdgeInsets.only(top: 10), alignment: Alignment.topCenter, child: Text(widget.licenseListModel.clientName,style: TextStyle(fontWeight: FontWeight.bold, fontSize: w * 0.05),)),
               Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(widget.licenseListModel.id),
-              Text(widget.licenseListModel.systemId),
+              Text(widget.licenseListModel.expiryDate),
               Text(widget.licenseListModel.systemName),],)
             ],
           ),

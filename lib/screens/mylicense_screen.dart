@@ -33,7 +33,10 @@ class _MyLicenseState extends State<MyLicense> {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     width = w; height = h; 
-    return Scaffold(appBar: AppBar(title: const Text("RetailX License"),),
+    bool isChecked = false;
+
+    return Scaffold(appBar: AppBar(
+      title: const Text("RetailX License"),),
       body: SingleChildScrollView(
         child: Column(children: [
           Row(children: [
@@ -79,7 +82,7 @@ class _MyLicenseState extends State<MyLicense> {
               Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
               
               Container(height: height * 0.05,width: width * 0.2,decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
-              child: const Text("Sys. ID",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
+              child: const Text("Expiry",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
             ],
           ),
           const SizedBox(height: 2,),
@@ -133,7 +136,7 @@ class _MyLicenseState extends State<MyLicense> {
               id: responseList[i]["id"] ?? "", 
               clientName: responseList[i]["clientname"] ?? "", 
               systemName: responseList[i]["systemname"] ?? "", 
-              systemId: responseList[i]["systemid"] ?? ""
+              expiryDate: responseList[i]["expiryDate"] ?? ""
               );
             clientsList.add(clientObj);
           }

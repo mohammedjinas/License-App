@@ -9,6 +9,8 @@ import 'package:printing/printing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/client_search_model.dart';
+
 class SetLicense extends StatefulWidget {
   final String? qrResult;
 
@@ -102,7 +104,18 @@ class _SetLicenseState extends State<SetLicense> {
               return const ScanScreen();
             },));
           },
-          ),),
+          ),
+          actions: [
+            IconButton(onPressed: () async {
+            ClientSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
+            setState(() {
+              // clientName = selectedItem.name.toUpperCase();
+              txtCustomerId.text = selectedItem.customerId.toString();
+              // resultText.text = "";
+              // noOfLicense.text = selectedItem.noOfLicense.toLowerCase();
+            });
+          }, icon: Icon(Icons.search))
+          ],),
         floatingActionButton:  FloatingActionButton(
           onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) {
             return FutureBuilder(
@@ -375,11 +388,9 @@ class _SetLicenseState extends State<SetLicense> {
                       title: const Text("RetailX License"),
                       content: const Text("Do you wish to update client name?"),
                       actions: [
-                        TextButton(onPressed: () {option = "Update"; generateLicense(licenseType); Navigator.of(context).pop();}, child: const Text("Yes")),
+                        TextButton(onPressed: () {option = "Update"; generateLicense(licenseType,"1"); Navigator.of(context).pop();}, child: const Text("Yes")),
 
-                        TextButton(onPressed: () {
-                          Navigator.of(context).pop(); return;
-                        }, child: const Text("No"))
+                        TextButton(onPressed: () {option = "Update"; generateLicense(licenseType,"0"); Navigator.of(context).pop();}, child: const Text("No"))
                       ],
                     )));
                   }, child: const Text("Yes"))
@@ -387,12 +398,12 @@ class _SetLicenseState extends State<SetLicense> {
               }
               else 
               {
-                generateLicense(licenseType);
+                generateLicense(licenseType,"0");
               }
             }
             else if(jsonData['result'] == 2)
             {
-              generateLicense(licenseType);
+              generateLicense(licenseType,"0");
             }
             else
             {
@@ -443,7 +454,7 @@ class _SetLicenseState extends State<SetLicense> {
                       title: const Text("RetailX License"),
                       content: const Text("Do you wish to update client name?"),
                       actions: [
-                        TextButton(onPressed: () {option = "Update"; generateLicense(licenseType); Navigator.of(context).pop();}, child: const Text("Yes")),
+                        TextButton(onPressed: () {option = "Update"; generateLicense(licenseType,"0"); Navigator.of(context).pop();}, child: const Text("Yes")),
 
                         TextButton(onPressed: () {
                           Navigator.of(context).pop(); return;
@@ -455,12 +466,12 @@ class _SetLicenseState extends State<SetLicense> {
               }
               else 
               {
-                generateLicense(licenseType);
+                generateLicense(licenseType,"0");
               }
             }
             else if(jsonData['result'] == 2)
             {
-              generateLicense(licenseType);
+              generateLicense(licenseType,"0");
             }
             else
             {
@@ -484,7 +495,7 @@ class _SetLicenseState extends State<SetLicense> {
     }
   }
 
-  void generateLicense(String licenseType) async
+  void generateLicense(String licenseType, String changeName) async
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? message = widget.qrResult, username = prefs.getString("username"), remarks,
@@ -509,7 +520,7 @@ class _SetLicenseState extends State<SetLicense> {
       remarks = txtRemarks.text;
 
       Map<String,String> mapPostData = {
-      'postdata': message, 'Remarks': remarks, 'Option' : option
+      'postdata': message, 'Remarks': remarks, 'Option' : option,'ChangeName' : changeName
       };
 
       var jsonPostdata = jsonEncode(mapPostData);
@@ -527,7 +538,7 @@ class _SetLicenseState extends State<SetLicense> {
             txtLicenseName = jsonData['licenceName'];
             txtLicenseType = jsonData['licenceType'];
             licenseId = jsonData["licenseId"];
-            licenseExist = false;
+            // licenseExist = false;
           });
         }
         else
@@ -637,7 +648,7 @@ class _SetLicenseState extends State<SetLicense> {
       }
       else
       {
-        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(response.body.toString()),
+        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: Text(response.body.toString() ),
         actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
         return false;
       }
@@ -657,11 +668,23 @@ class _SetLicenseState extends State<SetLicense> {
     Response response = await get(url); 
     if(response.statusCode == 200)
     {
-      if(response.body.toString() != "Expired")
+      final responseBody = jsonDecode(response.body);
+      if(responseBody["resultString1"].toString() != "")
+        setState(() { selectedValue = responseBody["resultString1"].toString().toUpperCase();});
+      
+
+      if(responseBody["resultString2"].toString() != "Not Found")
       {
         licenseExist = true;
-        return await showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(response.body.toString()),
-        actions: [TextButton(onPressed: () {Navigator.of(context).pop(true);}, child: const Text("OK"))],)));
+        if(response.body.toString() != 'Expired')
+        {
+          return await showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(responseBody["resultString2"].toString()),
+          actions: [TextButton(onPressed: () {Navigator.of(context).pop(true);}, child: const Text("OK"))],)));
+        }
+        else
+        {
+          return true;
+        }
       }
       else{
         licenseExist = false;
@@ -677,4 +700,142 @@ class _SetLicenseState extends State<SetLicense> {
         ],)));
     }
   }
+}
+
+class MySearchDelegate extends SearchDelegate
+{
+  List<ClientSearchModel> customerList = [];  
+  
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [IconButton(onPressed: () {
+      if(query.isEmpty)
+      {
+        close(context, null);
+      }
+      else
+      {
+        query = "";
+      }
+    }, icon: Icon(Icons.clear))];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    IconButton(onPressed: (){
+      close(context, null);
+    }, icon: Icon(Icons.arrow_back));
+    return null;
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return FutureBuilder(future: searchCustomer(query,context),
+      builder: ((context, snapshot) {
+      if(snapshot.connectionState == ConnectionState.done)
+      {
+        if(snapshot.hasData)
+        return buildList(snapshot.data);
+        else return Container();
+      }
+      else
+      {
+        return Container();
+      }
+    }));
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Container();
+  }
+
+  Future<List<ClientSearchModel>?> searchCustomer(String searchText,BuildContext ctx) async
+  {
+    if(searchText == "")
+    {
+      return null;
+    }
+    List<ClientSearchModel> customerList = []; 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? baseURL = prefs.getString("baseURL");
+    final url = Uri.parse("$baseURL/Home/SearchCustomer/$searchText");
+    Response response = await get(url);
+
+    if(response.statusCode == 200)
+    {
+      final searchResult = jsonDecode(response.body);
+      if(searchResult["result"] == 1)
+      {
+        if(searchResult["clientList"] != null)
+        {
+          final List<dynamic> responseList = searchResult["clientList"];
+          for(int i = 0; i < responseList.length; i++)
+          {
+            ClientSearchModel obj = ClientSearchModel(name: responseList[i]["name"], customerId: responseList[i]["customerId"], noOfLicense: responseList[i]["noOfLicense"]);
+            customerList.add(obj);
+          }
+        }
+        else
+        {
+          showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text("No customer found"),
+          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+        }
+      }
+      else
+      {
+        showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(searchResult["message"]),
+          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+      }
+    }
+    else{
+        showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("HTTP request failed."),
+          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+    }
+
+    return customerList;
+  }
+
+  Widget buildList(List<ClientSearchModel>? clientList)
+  {
+   if(clientList!.isNotEmpty) return ListView.builder(itemBuilder: ((context, index) {
+      
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+      return InkWell(
+        child: Container(
+          height: height * 0.05,
+          width: width * 0.9,
+          decoration: BoxDecoration(color: Colors.blue[50]),
+          alignment: Alignment.center,
+          child:  FittedBox(
+            fit: BoxFit.fitWidth, 
+            child: Row(children: [
+              Text(
+                clientList[index].name, 
+                style: TextStyle(
+                color: Colors.black, 
+                fontSize: height * 0.015),
+              ),
+              SizedBox(width: width * 0.05,),
+              Text(
+                clientList[index].customerId, 
+                style: TextStyle(
+                color: Colors.black, 
+                fontSize: height * 0.02),
+              ),
+            ],) 
+            ),
+          ),
+          onTap: () {
+            ClientSearchModel selectedItem = ClientSearchModel(name: clientList[index].name, customerId: clientList[index].customerId, noOfLicense: clientList[index].noOfLicense);
+            close(context, selectedItem);
+          },
+      );
+    }),
+    itemCount: clientList.length,);
+    else
+    {return Container();}
+  }
+
 }

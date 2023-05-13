@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -21,6 +22,7 @@ class _ClientGenerationState extends State<ClientGeneration> {
   late Future? systemNames;
   TextEditingController noOfLicense = TextEditingController();
   TextEditingController clientId = TextEditingController();
+  TextEditingController customerName = TextEditingController();
   bool flagHasLicense = false;
   
 
@@ -42,7 +44,8 @@ class _ClientGenerationState extends State<ClientGeneration> {
           IconButton(onPressed: () async {
             ClientSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
             setState(() {
-              clientName = selectedItem.name.toUpperCase();
+              // clientName = selectedItem.name.toUpperCase();
+              customerName.text = selectedItem.name.toUpperCase();
               clientId.text = selectedItem.customerId.toString();
               noOfLicense.text = selectedItem.noOfLicense.toLowerCase();
             });
@@ -62,17 +65,17 @@ class _ClientGenerationState extends State<ClientGeneration> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              if(clientName!.isNotEmpty && clientName != "" )
-            Container(alignment: Alignment.center,  width: width * 0.9, padding: const EdgeInsets.only(bottom: 10),
-              child: Text(clientName!,style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.05),),),
-              
+            //   if(clientName!.isNotEmpty && clientName != "" )
+            // Container(alignment: Alignment.center,  width: width * 0.9, padding: const EdgeInsets.only(bottom: 10),
+            //   child: Text(clientName!,style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.05),),),
+              SizedBox(height: 5,),
           Row(
             children: [
-              Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer ID",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer ID",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
                 hintText: "Customer ID",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
                 controller: clientId,
                 ),),
-              
+
                 SizedBox(height: width * 0.1, width: width * 0.1,
                   child: IconButton(
                     onPressed: () {
@@ -86,7 +89,7 @@ class _ClientGenerationState extends State<ClientGeneration> {
                         }
                         else{
                           setState(() {
-                            systemNames = getSystemList();                        
+                            systemNames = getSystemList();
                           });
                         }
                       }
@@ -101,10 +104,23 @@ class _ClientGenerationState extends State<ClientGeneration> {
             ],
           ),
           
-          Container(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10), child: TextField(decoration: InputDecoration(labelText: "No of license(s)",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
-            hintText: "No of license(s)", border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
-            controller: noOfLicense, maxLength: 3,
-            ),),
+          
+
+                // Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                // hintText: "Customer name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.text,
+                // controller: customerName,
+                // ),),
+
+                Container(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10), child: TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                  hintText: "Customer name", border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.text,
+                  controller: customerName,
+                  ),),
+
+
+                Container(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10), child: TextField(decoration: InputDecoration(labelText: "No of license(s)",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                  hintText: "No of license(s)", border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
+                  controller: noOfLicense, maxLength: 3,
+                  ),),
           
           flagHasLicense ? 
           ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
@@ -193,9 +209,11 @@ class _ClientGenerationState extends State<ClientGeneration> {
     {
       final systemListResponse = jsonDecode(response.body);
       noOfLicense.text = systemListResponse["noOfLicense"].toString() ;
+
       if(systemListResponse["result"] == 1)
       {
-        clientName = systemListResponse["clientName"];
+        // clientName = systemListResponse["clientName"];
+        customerName.text = systemListResponse["clientName"];
         
         if(systemListResponse["systemNames"] != null) {
           final List<dynamic> responseList = systemListResponse["systemNames"];
@@ -208,15 +226,15 @@ class _ClientGenerationState extends State<ClientGeneration> {
               systemList.add(obj);
             }
            
-            setState(() {
-              flagHasLicense = true;
-            });
+            // setState(() {
+            //   flagHasLicense = true;
+            // });
           }
         }
         else{
-          setState(() {
-          flagHasLicense = false;
-          });
+          // setState(() {
+          // flagHasLicense = false;
+          // });
           
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:  Text(systemListResponse["message"],style: const  TextStyle(color: Colors.black),),
@@ -225,11 +243,16 @@ class _ClientGenerationState extends State<ClientGeneration> {
           backgroundColor: Colors.grey[350],
         ));
         }
+        
+          setState(() {
+          customerName.text = systemListResponse["clientName"];
+          flagHasLicense = true;
+        });
       }
       else
       {
         setState(() {
-          clientName = "";
+          customerName.text = "";
           flagHasLicense = false;
           // noOfLicense.text = "";
         });
@@ -254,8 +277,8 @@ class _ClientGenerationState extends State<ClientGeneration> {
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? baseURL = prefs.getString("baseURL");
-    String licenseNo = noOfLicense.text, clientID = clientId.text;
-    final url = Uri.parse("$baseURL/Home/InsertClient/$clientID,$licenseNo");
+    String licenseNo = noOfLicense.text, clientID = clientId.text, custName = customerName.text;
+    final url = Uri.parse("$baseURL/Home/InsertClient/$clientID,$licenseNo,$custName");
     Response response = await get(url);
     final retString = response.body.toString();
 
@@ -270,6 +293,7 @@ class _ClientGenerationState extends State<ClientGeneration> {
     setState(() {
       clientId.text = "";
       noOfLicense.text = "";
+      customerName.text = "";
     });
   }
 
@@ -277,8 +301,8 @@ class _ClientGenerationState extends State<ClientGeneration> {
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? baseURL = prefs.getString("baseURL");
-    String licenseNo = noOfLicense.text, clientID = clientId.text;
-    final url = Uri.parse("$baseURL/Home/UpdateClient/$clientID,$licenseNo");
+    String licenseNo = noOfLicense.text, clientID = clientId.text, custName = customerName.text;
+    final url = Uri.parse("$baseURL/Home/UpdateClient/$clientID,$licenseNo,$custName");
     await get(url);
 
     // ignore: use_build_context_synchronously
@@ -292,6 +316,7 @@ class _ClientGenerationState extends State<ClientGeneration> {
     setState(() {
       clientId.text = "";
       noOfLicense.text = "";
+      customerName.text = "";
     });
   }
 }
@@ -324,12 +349,6 @@ class MySearchDelegate extends SearchDelegate
 
   @override
   Widget buildResults(BuildContext context) {
-    
-        return Container();
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(future: searchCustomer(query,context),
       builder: ((context, snapshot) {
       if(snapshot.connectionState == ConnectionState.done)
@@ -343,6 +362,11 @@ class MySearchDelegate extends SearchDelegate
         return Container();
       }
     }));
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Container();
   }
 
   Future<List<ClientSearchModel>?> searchCustomer(String searchText,BuildContext ctx) async

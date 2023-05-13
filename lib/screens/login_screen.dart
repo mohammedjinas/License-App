@@ -22,7 +22,6 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () {
     getUserFlag();
@@ -122,7 +121,8 @@ class _LoginState extends State<Login> {
   {
     if(isChecked)
     {
-      baseURL = "http://192.168.1.100:96";
+      // baseURL = "http://192.168.1.100:96";
+      baseURL = "http://192.168.1.127:1111";
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: const Text("URL set to Office",style: TextStyle(color: Colors.black),),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
@@ -162,13 +162,6 @@ class _LoginState extends State<Login> {
             setState(() {
               loginPressed = false;
             });
-
-            // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            //   content: const Text("Logged In Successfully.",style: TextStyle(color: Colors.black),),
-            //   shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
-            //   behavior: SnackBarBehavior.floating,
-            //   backgroundColor: Colors.grey[350],
-            // ));
 
             Navigator.of(context).push(MaterialPageRoute(builder: (_) {return HomePage(userFlag: userFlag,);} ));
           }
@@ -247,9 +240,9 @@ void checkLoginStatus() async
   }
 
   void getUserFlag() async
-{
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  userFlag = prefs.getInt("userFlag")!;
-}
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userFlag = prefs.getInt("userFlag")!;
+  }
 
 }

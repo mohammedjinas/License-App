@@ -2,12 +2,12 @@ class LicenseListModel{
    String id;
    String clientName;
    String systemName;
-   String systemId;
+   String expiryDate;
 
   LicenseListModel({
     required this.id, 
     required this.clientName, 
     required this.systemName, 
-    required this.systemId
+    required this.expiryDate
   });
 }

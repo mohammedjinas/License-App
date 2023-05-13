@@ -33,10 +33,10 @@ class ClientsList extends StatelessWidget {
             Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
             
             Container(height: height * 0.05,width: width * 0.2,decoration: BoxDecoration(color: Colors.blue[50]),alignment: Alignment.center,
-            child: Text(licenseList[index].systemId,style: TextStyle(color: Colors.black, fontSize: height * 0.015),),),
+            child: Text(licenseList[index].expiryDate,style: TextStyle(color: Colors.black, fontSize: height * 0.015),),),
         ],),
         onTap: () {
-          LicenseListModel selectedItem = LicenseListModel(id: licenseList[index].id, clientName: licenseList[index].clientName, systemName: licenseList[index].systemName, systemId: licenseList[index].systemId);
+          LicenseListModel selectedItem = LicenseListModel(id: licenseList[index].id, clientName: licenseList[index].clientName, systemName: licenseList[index].systemName, expiryDate: licenseList[index].expiryDate);
           Navigator.of(context).push(MaterialPageRoute(builder: ((context) {
             return LicenseDetail(licenseListModel: selectedItem,);
           })));
