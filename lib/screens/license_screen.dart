@@ -94,160 +94,168 @@ class _SetLicenseState extends State<SetLicense> {
       licenseCode = split[2];
     }
 
-    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)),
-      child: Scaffold(
-        appBar: AppBar(title:const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
-        leading: GestureDetector(
-          child: const Icon(Icons.arrow_back),
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-              return const ScanScreen();
-            },));
-          },
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)),
+        child: Scaffold(
+          appBar: AppBar(title:const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),),
+          leading: GestureDetector(
+            child: const Icon(Icons.arrow_back),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return const ScanScreen();
+              },));
+            },
+            ),
+            actions: [
+              IconButton(onPressed: () async {
+              ClientSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
+              setState(() {
+                // clientName = selectedItem.name.toUpperCase();
+                txtCustomerId.text = selectedItem.customerId.toString();           
+                if (txtCustomerId.text.isNotEmpty && txtCustomerId.text != "") {
+                checkLicenseStatus();
+                }
+                // resultText.text = "";
+                // noOfLicense.text = selectedItem.noOfLicense.toLowerCase();
+              });
+            }, icon: Icon(Icons.search))
+            ],),
+          floatingActionButton:  FloatingActionButton(
+            onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) {
+              return FutureBuilder(
+                future: pdfFile,
+                builder: ((context, snapshot) {
+                if(txtLicenseName != "" && txtLicenseName!.isNotEmpty)
+                {
+                  return PdfPreview(build: (context) => snapshot.data);
+                }
+                else {return  Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)),
+                  child: AlertDialog(title: const Text("RetailX License"),content: const Text("No license generated to share."),
+                  actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),
+                );}
+              }));
+            }))); },
+            backgroundColor: Colors.black,
+            child: const Icon(Icons.picture_as_pdf),
           ),
-          actions: [
-            IconButton(onPressed: () async {
-            ClientSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
-            setState(() {
-              // clientName = selectedItem.name.toUpperCase();
-              txtCustomerId.text = selectedItem.customerId.toString();
-              // resultText.text = "";
-              // noOfLicense.text = selectedItem.noOfLicense.toLowerCase();
-            });
-          }, icon: Icon(Icons.search))
-          ],),
-        floatingActionButton:  FloatingActionButton(
-          onPressed: () {Navigator.of(context).push(MaterialPageRoute(builder: ((context) {
-            return FutureBuilder(
-              future: pdfFile,
-              builder: ((context, snapshot) {
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Colors.transparent,
+          body: Center(
+            child: Column( children: [
+    
+              Container(padding: const EdgeInsets.all(10), alignment: Alignment.center, 
+              child: Text(txtCompanyName!, style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.04),)
+              ),
+    
+              Container(padding: EdgeInsets.symmetric(vertical: height * 0.03, horizontal: width * 0.03),
+              child: Row(children: [
+    
+                Container( width:width * 0.4,height: height * 0.05,alignment: Alignment.bottomCenter,
+                child: TextField(textAlign: TextAlign.center, 
+                keyboardType: TextInputType.number, 
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(labelText: "Customer ID",hintText: "Customer ID",hintStyle:const TextStyle(color: Colors.black87), focusColor: Colors.blue,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+                    controller: txtCustomerId,
+                    focusNode: customerIdFocus,
+                    ),),
+      
+                Container(width:width * 0.4,height: height * 0.05, padding: EdgeInsets.only(left: width * 0.02),alignment: Alignment.center,
+                child: 
+                TextField(textAlign: TextAlign.center, 
+                keyboardType: TextInputType.number, 
+                decoration: InputDecoration(labelText: "Trial Days",hintText: "Trial Days",hintStyle:const TextStyle(color: Colors.black87), focusColor: Colors.blue,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),                  
+                    inputFormatters: [LengthLimitingTextInputFormatter(2)],
+                    onChanged: ((value) { if(value.isNotEmpty || value != "") trialDays = int.parse(value);}),
+                    controller: txtTrialDays,
+                    focusNode: trialDaysFocus,
+                    ),
+                ),
+      
+                Container(width: width * 0.12, height:  width* 0.12,padding: EdgeInsets.only(left: width * 0.02),alignment: Alignment.center,
+                child: Ink.image(image:const AssetImage("assets/images/remarks.png"),
+                child: InkWell(onTap: () {
+                  showRemarksDialog();
+                },),),) 
+              ]),),
+      
+              Container(alignment: Alignment.center, 
+              child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   const Text("Sales Man: ", style: TextStyle(fontWeight: FontWeight.w600,),),
+                   
+                   Container(height: height * 0.045,
+                    decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).primaryColor),
+                    borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal : 5.0),
+                    child: FutureBuilder(future: salesMenList, 
+                    builder: ((context, snapshot) {
+                    if(snapshot.hasData)
+                    {
+                      return DropdownButton(items: snapshot.data, onChanged: (value) {
+                        setState(() {
+                          selectedValue = value!;
+                        });
+                      },
+                      value: selectedValue,
+                      alignment: Alignment.center,
+                      dropdownColor: Colors.blue[50]);
+                    }
+                    else {return DropdownButton(items: null, onChanged: (value) {},hint: const Text("Select sales man"),);}
+                    })),
+                   ),       
+                ],
+              )
+              ),
+      
+              Container(padding: EdgeInsets.symmetric(vertical: height * 0.01, horizontal: width * 0.03),
+              child: Column(children: [
+                
+                Container( width: width * 0.6, height: height * 0.05,padding: const EdgeInsets.only(bottom: 5),
+                  child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, txtCompanyName!,"T");}, style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10, ),
+                  child: const Text("Trial License",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.w600),textAlign: TextAlign.center,)),
+                ),
+                
+                SizedBox(width: width * 0.6, height: height * 0.05,
+                  child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, txtCompanyName!,"F");},style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10), 
+                  child: const Text("Full License",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.w600),textAlign: TextAlign.center,)),
+                ),
+              ],),),
+      
+              SizedBox(height: height * 0.02,),
+              
+              Container(height: 2, width: width, color: Colors.grey[300],),
+              
+              SizedBox(height: height * 0.05,),
+    
               if(txtLicenseName != "" && txtLicenseName!.isNotEmpty)
-              {
-                return PdfPreview(build: (context) => snapshot.data);
-              }
-              else {return  Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover)),
-                child: AlertDialog(title: const Text("RetailX License"),content: const Text("No license generated to share."),
-                actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],),
-              );}
-            }));
-          }))); },
-          backgroundColor: Colors.black,
-          child: const Icon(Icons.picture_as_pdf),
-        ),
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: Column( children: [
-
-            Container(padding: const EdgeInsets.all(10), alignment: Alignment.center, 
-            child: Text(txtCompanyName!, style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.04),)
-            ),
-
-            Container(padding: EdgeInsets.symmetric(vertical: height * 0.03, horizontal: width * 0.03),
-            child: Row(children: [
-
-              Container( width:width * 0.4,height: height * 0.05,alignment: Alignment.bottomCenter,
-              child: TextField(textAlign: TextAlign.center, 
-              keyboardType: TextInputType.number, 
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(labelText: "Customer ID",hintText: "Customer ID",hintStyle:const TextStyle(color: Colors.black87), focusColor: Colors.blue,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                  controller: txtCustomerId,
-                  focusNode: customerIdFocus,
-                  ),),
+              Column(
+                children: [
+                  
+                  Text(txtLicenseType!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.05,color: Colors.blueGrey),),
+                  
+                  SizedBox(height: height * 0.03 ,),
+      
+                  Text(txtComputerName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.08,color: Colors.black87),),
+                  
+                  SizedBox(height: height * 0.03 ,),
+      
+                  Text(txtLicenseName!,style: TextStyle(fontWeight: FontWeight.w700, fontSize: width * 0.05,color: Colors.red),),
     
-              Container(width:width * 0.4,height: height * 0.05, padding: EdgeInsets.only(left: width * 0.02),alignment: Alignment.center,
-              child: 
-              TextField(textAlign: TextAlign.center, 
-              keyboardType: TextInputType.number, 
-              decoration: InputDecoration(labelText: "Trial Days",hintText: "Trial Days",hintStyle:const TextStyle(color: Colors.black87), focusColor: Colors.blue,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),                  
-                  inputFormatters: [LengthLimitingTextInputFormatter(2)],
-                  onChanged: ((value) { if(value.isNotEmpty || value != "") trialDays = int.parse(value);}),
-                  controller: txtTrialDays,
-                  focusNode: trialDaysFocus,
-                  ),
+                  SizedBox(height: height * 0.03 ,),
+      
+                  Text(txtCompanyName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.05,color: Colors.black87),),
+                ],
               ),
-    
-              Container(width: width * 0.12, height:  width* 0.12,padding: EdgeInsets.only(left: width * 0.02),alignment: Alignment.center,
-              child: Ink.image(image:const AssetImage("assets/images/remarks.png"),
-              child: InkWell(onTap: () {
-                showRemarksDialog();
-              },),),) 
-            ]),),
-    
-            Container(alignment: Alignment.center, 
-            child: Row(mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                 const Text("Sales Man: ", style: TextStyle(fontWeight: FontWeight.w600,),),
-                 
-                 Container(height: height * 0.045,
-                  decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).primaryColor),
-                  borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(horizontal : 5.0),
-                  child: FutureBuilder(future: salesMenList, 
-                  builder: ((context, snapshot) {
-                  if(snapshot.hasData)
-                  {
-                    return DropdownButton(items: snapshot.data, onChanged: (value) {
-                      setState(() {
-                        selectedValue = value!;
-                      });
-                    },
-                    value: selectedValue,
-                    alignment: Alignment.center,
-                    dropdownColor: Colors.blue[50]);
-                  }
-                  else {return DropdownButton(items: null, onChanged: (value) {},hint: const Text("Select sales man"),);}
-                  })),
-                 ),       
-              ],
-            )
-            ),
-    
-            Container(padding: EdgeInsets.symmetric(vertical: height * 0.01, horizontal: width * 0.03),
-            child: Column(children: [
-              
-              Container( width: width * 0.6, height: height * 0.05,padding: const EdgeInsets.only(bottom: 5),
-                child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, txtCompanyName!,"T");}, style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10, ),
-                child: const Text("Trial License",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.w600),textAlign: TextAlign.center,)),
-              ),
-              
-              SizedBox(width: width * 0.6, height: height * 0.05,
-                child: ElevatedButton(onPressed: () {isExisting(txtCustomerId.text, txtCompanyName!,"F");},style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 10), 
-                child: const Text("Full License",style: TextStyle(color: Colors.black87,fontWeight: FontWeight.w600),textAlign: TextAlign.center,)),
-              ),
-            ],),),
-    
-            SizedBox(height: height * 0.02,),
-            
-            Container(height: 2, width: width, color: Colors.grey[300],),
-            
-            SizedBox(height: height * 0.05,),
-
-            if(txtLicenseName != "" && txtLicenseName!.isNotEmpty)
-            Column(
-              children: [
-                
-                Text(txtLicenseType!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.05,color: Colors.blueGrey),),
-                
-                SizedBox(height: height * 0.03 ,),
-    
-                Text(txtComputerName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.08,color: Colors.black87),),
-                
-                SizedBox(height: height * 0.03 ,),
-    
-                Text(txtLicenseName!,style: TextStyle(fontWeight: FontWeight.w700, fontSize: width * 0.05,color: Colors.red),),
-
-                SizedBox(height: height * 0.03 ,),
-    
-                Text(txtCompanyName!,style: TextStyle(fontWeight: FontWeight.w500, fontSize: width * 0.05,color: Colors.black87),),
-              ],
-            ),
-    
-          ],),
-        ),),
+      
+            ],),
+          ),),
+      ),
     );
   }
 
@@ -669,7 +677,7 @@ class _SetLicenseState extends State<SetLicense> {
     if(response.statusCode == 200)
     {
       final responseBody = jsonDecode(response.body);
-      if(responseBody["resultString1"].toString() != "")
+      if(responseBody["resultString1"].toString() != "" && responseBody["resultString1"].toString() != "null")
         setState(() { selectedValue = responseBody["resultString1"].toString().toUpperCase();});
       
 
@@ -730,6 +738,11 @@ class MySearchDelegate extends SearchDelegate
 
   @override
   Widget buildResults(BuildContext context) {
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(future: searchCustomer(query,context),
       builder: ((context, snapshot) {
       if(snapshot.connectionState == ConnectionState.done)
@@ -743,11 +756,6 @@ class MySearchDelegate extends SearchDelegate
         return Container();
       }
     }));
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return Container();
   }
 
   Future<List<ClientSearchModel>?> searchCustomer(String searchText,BuildContext ctx) async

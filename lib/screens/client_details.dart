@@ -79,7 +79,7 @@ class _ClientDetialsState extends State<ClientDetials> {
       
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
-                height: height *0.25, width: width,
+                height: height *0.27, width: width,
                 child: TextField(controller: resultText,maxLines: null,
                 readOnly: true,
                 decoration: const InputDecoration(border: InputBorder.none,),style: TextStyle(fontSize: height * 0.015),
@@ -245,6 +245,12 @@ class MySearchDelegate extends SearchDelegate
 
   @override
   Widget buildResults(BuildContext context) {
+    
+        return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(future: searchCustomer(query,context),
       builder: ((context, snapshot) {
       if(snapshot.connectionState == ConnectionState.done)
@@ -258,11 +264,27 @@ class MySearchDelegate extends SearchDelegate
         return Container();
       }
     }));
+<<<<<<< HEAD
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     return Container();
+=======
+    // return FutureBuilder(future: searchCustomer(query,context),
+    //   builder: ((context, snapshot) {
+    //   if(snapshot.connectionState == ConnectionState.done)
+    //   {
+    //     if(snapshot.hasData)
+    //     return buildList(snapshot.data);
+    //     else return Container();
+    //   }
+    //   else
+    //   {
+    //     return Container();
+    //   }
+    // }));
+>>>>>>> 3d350c2b8c18f4f8538ff9efcfe655ee826f4f90
   }
 
   Future<List<ClientDetSearchModel>?> searchCustomer(String searchText,BuildContext ctx) async

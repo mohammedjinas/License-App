@@ -27,56 +27,61 @@ class _ReportLicenseState extends State<ReportLicense> {
   Widget build(BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
-    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
-          child: Scaffold(backgroundColor: Colors.transparent,
-          appBar: AppBar(title: const Text("RetailX License"),),
-          body:  Column(mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
+            child: Scaffold(backgroundColor: Colors.transparent,
+            appBar: AppBar(title: const Text("RetailX License"),),
+            body:  Column(mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(padding: const EdgeInsets.all(10), child: 
+                  TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
+                  hintText: "Customer name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+                  onChanged: (value) => custName = value,
+                  ),
+                ),
+            
               Container(padding: const EdgeInsets.all(10), child: 
-                TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
-                hintText: "Customer name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                onChanged: (value) => custName = value,
+                TextField(decoration: InputDecoration( labelText: "URL",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
+                hintText: "URL",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+                onChanged: (value) => custUrl = value,
                 ),
               ),
-          
-            Container(padding: const EdgeInsets.all(10), child: 
-              TextField(decoration: InputDecoration( labelText: "URL",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
-              hintText: "URL",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-              onChanged: (value) => custUrl = value,
+    
+              Container(padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: TextField(
+                controller: date, 
+                decoration: const InputDecoration( 
+                    icon: Icon(Icons.calendar_today),),
+                readOnly: true,  
+                onTap: () async {
+                      pickedDate = await showDatePicker(
+                      context: context, initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101)
+                  );
+                  
+                  if(pickedDate != null ){
+                      String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate!); 
+                      setState(() {
+                          date.text = formattedDate;  
+                      });
+                    }
+                  },
+            ),
               ),
+    
+            const SizedBox(height: 20,),
+    
+            SizedBox(width: width * 0.6,
+              child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, 
+              child: const Text("Submit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+                onPressed: () {setLicense();},),
             ),
-
-            Container(padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-              controller: date, 
-              decoration: const InputDecoration( 
-                  icon: Icon(Icons.calendar_today),),
-              readOnly: true,  
-              onTap: () async {
-                    pickedDate = await showDatePicker(
-                    context: context, initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101)
-                );
-                
-                if(pickedDate != null ){
-                    String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate!); 
-                    setState(() {
-                        date.text = formattedDate;  
-                    });
-                  }
-                },
-          ),
-            ),
-
-          const SizedBox(height: 20,),
-
-          SizedBox(width: width * 0.6,
-            child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, 
-            child: const Text("Submit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-              onPressed: () {setLicense();},),
-          ),
-      ],)),
+        ],)),
+      ),
     );
   }
 
