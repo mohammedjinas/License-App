@@ -18,6 +18,15 @@ class MyApp extends StatelessWidget {
       // initialRoute: 'login',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        // checkboxTheme: CheckboxThemeData(
+        //   shape: RoundedRectangleBorder(
+        //     side: BorderSide(
+        //       color: Colors.white,
+        //       width: 15.0,
+        //     ),
+        //     borderRadius: BorderRadius.circular(4.0),
+        //   ),
+        // ),
       ),
       home:  MyHomePage(title: 'RetailX License'),
     );

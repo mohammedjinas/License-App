@@ -37,144 +37,154 @@ class _ClientGenerationState extends State<ClientGeneration> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      appBar: AppBar(title:const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),
-        ),
-        actions: [
-          IconButton(onPressed: () async {
-            ClientSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
-            setState(() {
-              // clientName = selectedItem.name.toUpperCase();
-              customerName.text = selectedItem.name.toUpperCase();
-              clientId.text = selectedItem.customerId.toString();
-              noOfLicense.text = selectedItem.noOfLicense.toLowerCase();
-            });
-          }, icon: Icon(Icons.search))
-        ],
-      ),
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.transparent,
-      body: Container(padding:  EdgeInsets.only(top: height * 0.05),
-      height: height,
-        decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assets/images/login_bg.jpg"),
-          fit: BoxFit.cover
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(
+        appBar: AppBar(title:const Text("RetailX License",style: TextStyle(fontSize: 20,fontWeight: FontWeight.w600),
           ),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-            //   if(clientName!.isNotEmpty && clientName != "" )
-            // Container(alignment: Alignment.center,  width: width * 0.9, padding: const EdgeInsets.only(bottom: 10),
-            //   child: Text(clientName!,style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.05),),),
-              SizedBox(height: 5,),
-          Row(
-            children: [
-                Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer ID",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
-                hintText: "Customer ID",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
-                controller: clientId,
-                ),),
+          actions: [
+            IconButton(onPressed: () async {
+              ClientSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
+              setState(() {
+                // clientName = selectedItem.name.toUpperCase();
+                customerName.text = selectedItem.name.toUpperCase();
+                clientId.text = selectedItem.customerId.toString();
+                noOfLicense.text = selectedItem.noOfLicense.toLowerCase();
 
-                SizedBox(height: width * 0.1, width: width * 0.1,
-                  child: IconButton(
-                    onPressed: () {
-                      if(clientId.text.isNotEmpty && clientId.text != "")
-                      {
-                        if(int.parse(clientId.text) < 0)
+                setState(() 
+                {
+                  systemNames = getSystemList();
+                });
+              });
+            }, icon: Icon(Icons.search))
+          ],
+        ),
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.transparent,
+        body: Container(padding:  EdgeInsets.only(top: height * 0.05),
+        height: height,
+          decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/login_bg.jpg"),
+            fit: BoxFit.cover
+            ),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+              //   if(clientName!.isNotEmpty && clientName != "" )
+              // Container(alignment: Alignment.center,  width: width * 0.9, padding: const EdgeInsets.only(bottom: 10),
+              //   child: Text(clientName!,style: TextStyle(fontWeight: FontWeight.bold,fontSize: width * 0.05),),),
+                SizedBox(height: 5,),
+            Row(
+              children: [
+                  Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer ID",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                  hintText: "Customer ID",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
+                  controller: clientId,
+                  ),),
+    
+                  SizedBox(height: width * 0.1, width: width * 0.1,
+                    child: IconButton(
+                      onPressed: () {
+                        if(clientId.text.isNotEmpty && clientId.text != "")
                         {
-                          showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Invalid Client ID"),
-                          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
-                          return;
+                          if(int.parse(clientId.text) < 0)
+                          {
+                            showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Invalid Client ID"),
+                            actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+                            return;
+                          }
+                          else{
+                            setState(() {
+                              systemNames = getSystemList();
+                            });
+                          }
                         }
                         else{
-                          setState(() {
-                            systemNames = getSystemList();
-                          });
+                          showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Invalid Client ID"),
+                            actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+                            return;
                         }
-                      }
-                      else{
-                        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Invalid Client ID"),
-                          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
-                          return;
-                      }
-                    },
-                    icon: const Icon(Icons.search_rounded),),
-                )
-            ],
-          ),
-          
-          
-
-                // Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
-                // hintText: "Customer name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.text,
-                // controller: customerName,
-                // ),),
-
-                Container(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10), child: TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
-                  hintText: "Customer name", border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.text,
-                  controller: customerName,
-                  ),),
-
-
-                Container(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10), child: TextField(decoration: InputDecoration(labelText: "No of license(s)",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
-                  hintText: "No of license(s)", border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
-                  controller: noOfLicense, maxLength: 3,
-                  ),),
-          
-          flagHasLicense ? 
-          ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
-            child: const Text("Update",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-            onPressed: () {
-              if(validateFields())
+                      },
+                      icon: const Icon(Icons.search_rounded),),
+                  )
+              ],
+            ),
+            
+            
+    
+                  // Container(width: width * 0.88, padding: const EdgeInsets.only(left: 10, right: 5, bottom: 5), child: TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                  // hintText: "Customer name",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.text,
+                  // controller: customerName,
+                  // ),),
+    
+                  Container(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10), child: TextField(decoration: InputDecoration(labelText: "Customer name",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                    hintText: "Customer name", border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.text,
+                    controller: customerName,
+                    ),),
+    
+    
+                  Container(padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10), child: TextField(decoration: InputDecoration(labelText: "No of license(s)",labelStyle: const TextStyle(color: Colors.black87), focusColor: Colors.blue, 
+                    hintText: "No of license(s)", border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),counterText: ""),keyboardType: TextInputType.number,
+                    controller: noOfLicense, maxLength: 3,
+                    ),),
+            
+            flagHasLicense ? 
+            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+              child: const Text("Update",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+              onPressed: () {
+                if(validateFields())
+                {
+                  updateClient();
+                }
+                // setState(() {
+                //   clientId.text = "";
+                //   noOfLicense.text = "";
+                // });
+              },
+            ) 
+            :
+            ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+              child: const Text("Generate",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+              onPressed: () {
+                if(validateFields())
+                {
+                  insertClient();
+                }
+                // setState(() {
+                //   clientId.text = "";
+                //   noOfLicense.text = "";
+                // });
+              },
+            ),
+                
+            const SizedBox(height: 2,),
+            
+            FutureBuilder(future: systemNames!,builder: ((context, snapshot) {
+                Widget clientsList =  Container();
+              if(snapshot.hasData)
               {
-                updateClient();
-              }
-              // setState(() {
-              //   clientId.text = "";
-              //   noOfLicense.text = "";
-              // });
-            },
-          ) 
-          :
-          ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
-            child: const Text("Generate",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-            onPressed: () {
-              if(validateFields())
-              {
-                insertClient();
-              }
-              // setState(() {
-              //   clientId.text = "";
-              //   noOfLicense.text = "";
-              // });
-            },
-          ),
-              
-          const SizedBox(height: 2,),
-          
-          FutureBuilder(future: systemNames!,builder: ((context, snapshot) {
-              Widget clientsList =  Container();
-            if(snapshot.hasData)
-            {
-              if(snapshot.connectionState == ConnectionState.done)
-              {
-                if(clientId.text != "") {
-                  clientsList = SystemList( snapshot.data, int.parse(clientId.text));
+                if(snapshot.connectionState == ConnectionState.done)
+                {
+                  if(clientId.text != "") {
+                    clientsList = SystemList( snapshot.data, int.parse(clientId.text));
+                  }
+                }
+                else 
+                {
+                  clientsList = const CircularProgressIndicator();
                 }
               }
-              else 
-              {
-                clientsList = const CircularProgressIndicator();
-              }
-            }
-            return clientsList;
-            }),),
-              
-              ],),
-        ),
-        ),
-  );
+              return clientsList;
+              }),),
+                
+                ],),
+          ),
+          ),
+      ),
+    );
 }
 
   bool validateFields()

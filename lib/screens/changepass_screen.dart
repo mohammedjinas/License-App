@@ -19,41 +19,46 @@ class _ChangePasswordState extends State<ChangePassword> {
   Widget build(BuildContext context) {
   double width = MediaQuery.of(context).size.width;
   double height = MediaQuery.of(context).size.height;
-    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
-              child: Scaffold(backgroundColor: Colors.transparent,
-              appBar: AppBar(title: const Text("RetailX License"),),
-              body:  Center(
-                child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
-                  TextField(decoration: InputDecoration(labelText: "Old Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
-                  hintText: "Old Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                  onChanged: (value) => oldPass = value,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
+                child: Scaffold(backgroundColor: Colors.transparent,
+                appBar: AppBar(title: const Text("RetailX License"),),
+                body:  Center(
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
+                    TextField(decoration: InputDecoration(labelText: "Old Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue, 
+                    hintText: "Old Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+                    onChanged: (value) => oldPass = value,
+                    ),
                   ),
-                ),
-                
-                Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
-                  TextField(decoration: InputDecoration( labelText: "New Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
-                  hintText: "New Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                  onChanged: (value) => newPass = value,
+                  
+                  Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
+                    TextField(decoration: InputDecoration( labelText: "New Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
+                    hintText: "New Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+                    onChanged: (value) => newPass = value,
+                    ),
                   ),
-                ),
-
-                Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
-                  TextField(decoration: InputDecoration( labelText: "Re-type Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
-                  hintText: "Re-type Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                  onChanged: (value) => retypePass = value,
+    
+                  Container(padding:const EdgeInsets.all(10),height: height * 0.09, child: 
+                    TextField(decoration: InputDecoration( labelText: "Re-type Password",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
+                    hintText: "Re-type Password",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+                    onChanged: (value) => retypePass = value,
+                    ),
                   ),
-                ),
-
-                SizedBox(width: width * 0.6,height: height * 0.05,
-                  child: 
-                  ElevatedButton(
-                    onPressed: () {changepass();},style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                    child: const Text("Submit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),)
+    
+                  SizedBox(width: width * 0.6,height: height * 0.05,
+                    child: 
+                    ElevatedButton(
+                      onPressed: () {changepass();},style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                      child: const Text("Submit",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600),)
+                    ),
                   ),
-                ),
-      ],),
-              )),
+        ],),
+                )),
+      ),
     );
   }
 

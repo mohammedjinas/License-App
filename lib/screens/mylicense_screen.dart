@@ -21,6 +21,7 @@ class _MyLicenseState extends State<MyLicense> {
 
   late Future licenseModel;
   String searchText = '-';
+  bool isChecked = false;
 
   @override
   void initState() {
@@ -33,76 +34,97 @@ class _MyLicenseState extends State<MyLicense> {
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     width = w; height = h; 
-    bool isChecked = false;
 
-    return Scaffold(appBar: AppBar(
-      title: const Text("RetailX License"),),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          Row(children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10,left: 10),
-              child: SizedBox(height: height *0.05, width: width * 0.8, //padding: const EdgeInsets.only(left: 10, right: 10,bottom: 10), 
-              child: TextField(decoration: InputDecoration(hintText: "Search...",border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))),
-              style: TextStyle(fontSize: height * 0.015,), onChanged: (value) {
-                searchText = value;
-              },)),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(appBar: AppBar(
+        actions: [
+          Center(
+            child: const Text("Expired",style: TextStyle(
+              fontSize: 15, 
+              fontWeight: FontWeight.bold
+              ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10,left : 10),
-              child: InkWell(child: const Icon(Icons.search_rounded,color: Colors.blueAccent),
-              onTap: () {
-                if(searchText != "-" && searchText != "") {
-                  setState(() {
-                    licenseModel = getLicenses(searchText);
-                  });
-                }
-              },),
-            )
-      
-          ],),
-
-          const SizedBox(height: 10,),
-
-          Row(
-            children: [
-              Container(height: height * 0.05,width: width * 0.1,decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
-              child: const Text("ID",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
-              
-              Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
-
-              Container(height: height * 0.05,width: width * 0.48, decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
-              child: const Text("Name",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
-              
-              Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
-
-              Container(height: height * 0.05,width: width * 0.2,decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
-              child: const Text("Sys. Name",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
-              
-              Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
-              
-              Container(height: height * 0.05,width: width * 0.2,decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
-              child: const Text("Expiry",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
-            ],
           ),
-          const SizedBox(height: 2,),
-
-          FutureBuilder(future: licenseModel,builder: ((context, snapshot) {
-            Widget clientsList =  Padding(padding: EdgeInsets.only(top: height * 0.4), child: const CircularProgressIndicator());
-          if(snapshot.hasData)
-          {
-            if(snapshot.connectionState == ConnectionState.done)
+          Checkbox(value: isChecked, onChanged: (value) {
+            setState(() {
+              isChecked = value!;
+              licenseModel = getLicenses(searchText);
+            });
+          },
+          activeColor: Colors.white,
+          checkColor: Colors.black,)
+        ],
+        title: const Text("RetailX License"),),
+        body: SingleChildScrollView(
+          child: Column(children: [
+            Row(children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10,left: 10),
+                child: SizedBox(height: height *0.05, width: width * 0.8, //padding: const EdgeInsets.only(left: 10, right: 10,bottom: 10), 
+                child: TextField(decoration: InputDecoration(hintText: "Search...",border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))),
+                style: TextStyle(fontSize: height * 0.015,), onChanged: (value) {
+                  searchText = value;
+                },)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10,left : 10),
+                child: InkWell(child: const Icon(Icons.search_rounded,color: Colors.blueAccent),
+                onTap: () {
+                  if(searchText != "-" && searchText != "") {
+                    setState(() {
+                      licenseModel = getLicenses(searchText);
+                    });
+                  }
+                },),
+              )
+        
+            ],),
+    
+            const SizedBox(height: 10,),
+    
+            Row(
+              children: [
+                Container(height: height * 0.05,width: width * 0.1,decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
+                child: const Text("ID",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
+                
+                Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
+    
+                Container(height: height * 0.05,width: width * 0.48, decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
+                child: const Text("Name",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
+                
+                Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
+    
+                Container(height: height * 0.05,width: width * 0.2,decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
+                child: const Text("Sys. Name",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
+                
+                Container(height: height * 0.05,width: width * 0.005, decoration: const BoxDecoration(color: Colors.grey)),
+                
+                Container(height: height * 0.05,width: width * 0.2,decoration: BoxDecoration(color: Colors.blue[100]),alignment: Alignment.center,
+                child: const Text("Expiry",style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),),),
+              ],
+            ),
+            const SizedBox(height: 2,),
+    
+            FutureBuilder(future: licenseModel,builder: ((context, snapshot) {
+              Widget clientsList =  Padding(padding: EdgeInsets.only(top: height * 0.4), child: const CircularProgressIndicator());
+            if(snapshot.hasData)
             {
-              clientsList = ClientsList(snapshot.data);
+              if(snapshot.connectionState == ConnectionState.done)
+              {
+                clientsList = ClientsList(snapshot.data);
+              }
+              else 
+              {
+                clientsList = const CircularProgressIndicator();
+              }
             }
-            else 
-            {
-              clientsList = const CircularProgressIndicator();
-            }
-          }
-          return clientsList;
-          }),),
-        ],),
+            return clientsList;
+            }),),
+          ],),
+        ),
       ),
     );
   }
@@ -113,6 +135,8 @@ class _MyLicenseState extends State<MyLicense> {
     String? baseURL = prefs.getString("baseURL");
     String? username = prefs.getString("username");
     int? userFlag = prefs.getInt("userFlag");
+    String isExpired = "";
+    isChecked ? isExpired = "1" : isExpired = "0";
     
 
     String callingFrom = widget.callingFrom!;
@@ -121,7 +145,7 @@ class _MyLicenseState extends State<MyLicense> {
       callingFrom = "Admin";
     }
     List<LicenseListModel> clientsList = [];
-    final url = Uri.parse("$baseURL/Home/GetClients/$callingFrom/$username/$searchText");
+    final url = Uri.parse("$baseURL/Home/GetClients/$callingFrom/$username/$isExpired/$searchText");
     Response response = await get(url);
     if(response != null)
       {
