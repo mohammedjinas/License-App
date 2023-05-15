@@ -264,28 +264,25 @@ class MySearchDelegate extends SearchDelegate
         return Container();
       }
     }));
-<<<<<<< HEAD
   }
 
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return Container();
-=======
-    // return FutureBuilder(future: searchCustomer(query,context),
-    //   builder: ((context, snapshot) {
-    //   if(snapshot.connectionState == ConnectionState.done)
-    //   {
-    //     if(snapshot.hasData)
-    //     return buildList(snapshot.data);
-    //     else return Container();
-    //   }
-    //   else
-    //   {
-    //     return Container();
-    //   }
-    // }));
->>>>>>> 3d350c2b8c18f4f8538ff9efcfe655ee826f4f90
-  }
+  // @override
+  // Widget buildSuggestions(BuildContext context) {
+  //   return Container();
+  //   // return FutureBuilder(future: searchCustomer(query,context),
+  //   //   builder: ((context, snapshot) {
+  //   //   if(snapshot.connectionState == ConnectionState.done)
+  //   //   {
+  //   //     if(snapshot.hasData)
+  //   //     return buildList(snapshot.data);
+  //   //     else return Container();
+  //   //   }
+  //   //   else
+  //   //   {
+  //   //     return Container();
+  //   //   }
+  //   // }));
+  // }
 
   Future<List<ClientDetSearchModel>?> searchCustomer(String searchText,BuildContext ctx) async
   {
