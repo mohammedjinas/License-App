@@ -261,9 +261,9 @@ class MySearchDelegate extends SearchDelegate
   }
 
   @override
-  Widget buildSuggestions(BuildContext context){
+  Widget buildSuggestions(BuildContext context) {
     return Container();
-  } 
+  }
 
   // @override
   // Widget buildSuggestions(BuildContext context) {
