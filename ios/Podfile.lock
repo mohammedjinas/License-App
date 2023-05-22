@@ -2,34 +2,23 @@ PODS:
   - Flutter (1.0.0)
   - image_picker_ios (0.0.1):
     - Flutter
-  - MTBBarcodeScanner (5.0.11)
   - permission_handler_apple (9.0.4):
     - Flutter
   - printing (1.0.0):
     - Flutter
-  - qr_code_scanner (0.2.0):
-    - Flutter
-    - MTBBarcodeScanner
-  - qr_code_tools (0.0.7):
-    - Flutter
   - scan (0.0.1):
     - Flutter
-  - shared_preferences_ios (0.0.1):
+  - shared_preferences_foundation (0.0.1):
     - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - printing (from `.symlinks/plugins/printing/ios`)
-  - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
-  - qr_code_tools (from `.symlinks/plugins/qr_code_tools/ios`)
   - scan (from `.symlinks/plugins/scan/ios`)
-  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
-
-SPEC REPOS:
-  trunk:
-    - MTBBarcodeScanner
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 EXTERNAL SOURCES:
   Flutter:
@@ -40,25 +29,18 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   printing:
     :path: ".symlinks/plugins/printing/ios"
-  qr_code_scanner:
-    :path: ".symlinks/plugins/qr_code_scanner/ios"
-  qr_code_tools:
-    :path: ".symlinks/plugins/qr_code_tools/ios"
   scan:
     :path: ".symlinks/plugins/scan/ios"
-  shared_preferences_ios:
-    :path: ".symlinks/plugins/shared_preferences_ios/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  image_picker_ios: b786a5dcf033a8336a657191401bfdf12017dabb
-  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
+  image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
   permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
-  printing: eafa00acb682c0ca029d4d98d0798f55a1e27102
-  qr_code_scanner: bb67d64904c3b9658ada8c402e8b4d406d5d796e
-  qr_code_tools: 5b5dd44ccdfa4b81f645c251e421f61003254b81
+  printing: 233e1b73bd1f4a05615548e9b5a324c98588640b
   scan: aea35bb4aa59ccc8839c576a18cd57c7d492cc86
-  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
+  shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
 
 PODFILE CHECKSUM: 0720ff67382cf4462302b30adf6ac1ddcdaa2b14
 
