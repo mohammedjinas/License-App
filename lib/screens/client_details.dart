@@ -245,12 +245,6 @@ class MySearchDelegate extends SearchDelegate
 
   @override
   Widget buildResults(BuildContext context) {
-    
-        return Container();
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(future: searchCustomer(query,context),
       builder: ((context, snapshot) {
       if(snapshot.connectionState == ConnectionState.done)
@@ -265,6 +259,11 @@ class MySearchDelegate extends SearchDelegate
       }
     }));
   }
+
+  @override
+  Widget buildSuggestions(BuildContext context){
+    return Container();
+  } 
 
   // @override
   // Widget buildSuggestions(BuildContext context) {
