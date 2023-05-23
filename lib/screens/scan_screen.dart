@@ -69,19 +69,20 @@ class _ScanScreenState extends State<ScanScreen> {
         
             ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("IMAGE",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
               onPressed: () async {
-                  PermissionStatus storageStatus = await Permission.storage.request();
+                  PermissionStatus mediaStatus = await Permission.photos.request();
 
-                  if(storageStatus == PermissionStatus.permanentlyDenied)
+                  if(mediaStatus == PermissionStatus.permanentlyDenied)
                   {
                     openAppSettings();
                   }
 
-                  if(storageStatus == PermissionStatus.denied)
+                  if(mediaStatus == PermissionStatus.denied)
                   {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("You need storage permission to upload QR.")));
+                    openAppSettings();                    
                   }
 
-                  if(storageStatus == PermissionStatus.granted)
+                  if(mediaStatus == PermissionStatus.granted)
                   {
                     imageQR(context);
                   }
@@ -115,7 +116,17 @@ class _ScanScreenState extends State<ScanScreen> {
     if(imagePath != "")
     {
       String? qrResult = await Scan.parse(imagePath!);
+      if(qrResult != null && qrResult != "")
       Navigator.of(context).push(MaterialPageRoute(builder: ((context) => SetLicense(qrResult: qrResult,))));
+      else
+      {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:  Text("QR code not clear or not found.",style: const  TextStyle(color: Colors.black),),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.grey[350],
+          ));
+      }
     }
   }
 

@@ -126,12 +126,12 @@ class _LicenseExpiryListState extends State<LicenseExpiryList> {
           ),),
 
           Row(
-            children: [ ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+            children: [ ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.26, 
                 child: const Text("Cancel",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
                           onPressed: () {Navigator.of(context).pop();},),
               Padding(
                 padding: const EdgeInsets.only(left: 10.0),
-                child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+                child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.26, 
                   child: const Text("Save",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
                   onPressed: () {
                         saveRemarks(id);

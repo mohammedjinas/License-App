@@ -358,7 +358,12 @@ class MySearchDelegate extends SearchDelegate
   }
 
   @override
-  Widget buildResults(BuildContext context) {
+  Widget buildResults(BuildContext context) {    
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(future: searchCustomer(query,context),
       builder: ((context, snapshot) {
       if(snapshot.connectionState == ConnectionState.done)
@@ -372,11 +377,6 @@ class MySearchDelegate extends SearchDelegate
         return Container();
       }
     }));
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return Container();
   }
 
   Future<List<ClientSearchModel>?> searchCustomer(String searchText,BuildContext ctx) async
@@ -411,11 +411,11 @@ class MySearchDelegate extends SearchDelegate
           actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
         }
       }
-      else
-      {
-        showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(searchResult["message"]),
-          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
-      }
+      // else
+      // {
+      //   showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(searchResult["message"]),
+      //     actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+      // }
     }
     else{
         showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("HTTP request failed."),

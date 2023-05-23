@@ -40,74 +40,79 @@ class _ClientDetialsState extends State<ClientDetials> {
     double h = MediaQuery.of(context).size.height;
     width = w; height = h; 
 
-    return Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
-      child: Scaffold(appBar: AppBar(title: const Text("RetailX License"),
-      actions: [
-          IconButton(onPressed: () async {
-            ClientDetSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
-            setState(() {
-              customerId.text = selectedItem.customerId.toString();
-              resultText.text = "";
-            });
-          }, icon: Icon(Icons.search))
-        ],
-      ),
-      resizeToAvoidBottomInset: false,backgroundColor: Colors.transparent,
-      body: SingleChildScrollView(
-        child: Column(children: [
-                  Container(padding: const EdgeInsets.all(10),width: width * 0.9,height: height * 0.09, child: 
-                    TextField(keyboardType: TextInputType.number, decoration: InputDecoration(labelText: "Customer ID",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
-                    hintText: "Customer ID",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
-                    controller: customerId,
+    return GestureDetector(
+      onTap:() {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/login_bg.jpg"),fit: BoxFit.cover),),
+        child: Scaffold(appBar: AppBar(title: const Text("RetailX License"),
+        actions: [
+            IconButton(onPressed: () async {
+              ClientDetSearchModel selectedItem = await showSearch(context: context, delegate: MySearchDelegate());
+              setState(() {
+                customerId.text = selectedItem.customerId.toString();
+                resultText.text = "";
+              });
+            }, icon: Icon(Icons.search))
+          ],
+        ),
+        resizeToAvoidBottomInset: false,backgroundColor: Colors.transparent,
+        body: SingleChildScrollView(
+          child: Column(children: [
+                    Container(padding: const EdgeInsets.all(10),width: width * 0.9,height: height * 0.09, child: 
+                      TextField(keyboardType: TextInputType.number, decoration: InputDecoration(labelText: "Customer ID",labelStyle: TextStyle(color: Colors.grey[600]), focusColor: Colors.blue,
+                      hintText: "Customer ID",border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),),
+                      controller: customerId,
+                      ),
                     ),
+                    
+                    Container(padding: const EdgeInsets.only(top: 10,),
+                    child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("Get Client Details",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
+                  onPressed: () {
+                      if(customerId.text == "" || customerId.text.isEmpty)
+                      {
+                        showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Enter a client's customer ID to getch details."),
+                        actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+                      }
+                      else {
+                      getClientDetails();
+                      }
+                    },
                   ),
-                  
-                  Container(padding: const EdgeInsets.only(top: 10,),
-                  child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,), child: Container(alignment: Alignment.center, width: width * 0.6, child: const Text("Get Client Details",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
-                onPressed: () {
-                    if(customerId.text == "" || customerId.text.isEmpty)
-                    {
-                      showDialog(context: context, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("Enter a client's customer ID to getch details."),
-                      actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
-                    }
-                    else {
-                    getClientDetails();
-                    }
-                  },
                 ),
-              ),
-      
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
-                height: height *0.27, width: width,
-                child: TextField(controller: resultText,maxLines: null,
-                readOnly: true,
-                decoration: const InputDecoration(border: InputBorder.none,),style: TextStyle(fontSize: height * 0.015),
+        
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
+                  height: height *0.27, width: width,
+                  child: TextField(controller: resultText,maxLines: null,
+                  readOnly: true,
+                  decoration: const InputDecoration(border: InputBorder.none,),style: TextStyle(fontSize: height * 0.015),
+                  ),
                 ),
-              ),
-      
-              const SizedBox(height: 2,),
-            
-            FutureBuilder(future: systemNames!,builder: ((context, snapshot) {
-                Widget clientsList =  Container();
-              if(snapshot.hasData)
-              {
-                if(snapshot.connectionState == ConnectionState.done)
+        
+                const SizedBox(height: 2,),
+              
+              FutureBuilder(future: systemNames!,builder: ((context, snapshot) {
+                  Widget clientsList =  Container();
+                if(snapshot.hasData)
                 {
-                  if(customerId.text != "") {
-                    clientsList = LicenseExpiryList( snapshot.data);
+                  if(snapshot.connectionState == ConnectionState.done)
+                  {
+                    if(customerId.text != "") {
+                      clientsList = LicenseExpiryList( snapshot.data);
+                    }
+                  }
+                  else 
+                  {
+                    clientsList = const CircularProgressIndicator();
                   }
                 }
-                else 
-                {
-                  clientsList = const CircularProgressIndicator();
-                }
-              }
-              return clientsList;
-              }),),
-            ],
-          ),
-      ),
+                return clientsList;
+                }),),
+              ],
+            ),
+        ),
+        ),
       ),
     );
   }
@@ -244,7 +249,12 @@ class MySearchDelegate extends SearchDelegate
   }
 
   @override
-  Widget buildResults(BuildContext context) {
+  Widget buildResults(BuildContext context) {    
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
     return FutureBuilder(future: searchCustomer(query,context),
       builder: ((context, snapshot) {
       if(snapshot.connectionState == ConnectionState.done)
@@ -260,36 +270,13 @@ class MySearchDelegate extends SearchDelegate
     }));
   }
 
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return Container();
-  }
-
-  // @override
-  // Widget buildSuggestions(BuildContext context) {
-  //   return Container();
-  //   // return FutureBuilder(future: searchCustomer(query,context),
-  //   //   builder: ((context, snapshot) {
-  //   //   if(snapshot.connectionState == ConnectionState.done)
-  //   //   {
-  //   //     if(snapshot.hasData)
-  //   //     return buildList(snapshot.data);
-  //   //     else return Container();
-  //   //   }
-  //   //   else
-  //   //   {
-  //   //     return Container();
-  //   //   }
-  //   // }));
-  // }
-
   Future<List<ClientDetSearchModel>?> searchCustomer(String searchText,BuildContext ctx) async
   {
     if(searchText == "")
     {
       return null;
     }
-    // List<ClientDetSearchModel> customerList = []; 
+    List<ClientDetSearchModel> customerList = []; 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? baseURL = prefs.getString("baseURL");
     final url = Uri.parse("$baseURL/Home/SearchCustomer/$searchText");
@@ -316,11 +303,11 @@ class MySearchDelegate extends SearchDelegate
           actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
         }
       }
-      else
-      {
-        showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(searchResult["message"]),
-          actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
-      }
+      // else
+      // {
+      //   showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content:  Text(searchResult["message"]),
+      //     actions: [TextButton(onPressed: () {Navigator.of(context).pop();}, child: const Text("OK"))],)));
+      // }
     }
     else{
         showDialog(context: ctx, builder: ((context) => AlertDialog(title: const Text("RetailX License"),content: const Text("HTTP request failed."),
@@ -360,11 +347,6 @@ class MySearchDelegate extends SearchDelegate
               child: InkWell(onTap: () {
                 showRemarksDialog(index,clientList[index].customerId,clientList[index].remarks,context);
               },),),
-                // IconButton(onPressed: () {
-                //   deleteClient(widget.systemsList[index].id);
-                //   setState(() {widget.systemsList.removeAt(index);});
-                // }, 
-                // icon: const Icon(Icons.delete_forever,color: Colors.red,),),
                 ),
               ],
             )
@@ -402,12 +384,12 @@ class MySearchDelegate extends SearchDelegate
           ),),
 
           Row(
-            children: [ ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+            children: [ ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.white,elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.2, 
                 child: const Text("Cancel",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
                           onPressed: () {Navigator.of(context).pop();},),
               Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.28, 
+                padding: const EdgeInsets.only(left: 5.5),
+                child: ElevatedButton( style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[100],elevation: 20), child: Container(alignment: Alignment.center, width: width * 0.2, 
                   child: const Text("Save",style: TextStyle(color: Colors.black,fontWeight: FontWeight.w500),)),
                   onPressed: () {
                         saveRemarks(id);
